@@ -1,0 +1,22 @@
+.surlHighlight {
+  all: inherit;
+  display: inline;
+  background: rgb(255, 255, 71, 1);
+  color: black;
+  font-weight: 800;
+  animation: fade 10s forwards;
+}
+
+@keyframes fade {
+  from {background-color:rgb(255, 255, 71, 1);}
+  to {background-color:rgba(255, 255, 71 0);}
+}
+
+.surl-copy-to-clipboard {
+  display: block;
+  z-index: 1000;
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+}
+
