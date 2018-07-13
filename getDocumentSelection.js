@@ -2,8 +2,8 @@ var getDocumentSelection = () => {
   var selection = window.getSelection()
   var setup = false
   try {
-    var uri = selection.anchorNode.baseURI
-    
+    // var uri = selection.anchorNode.baseURI
+    var uri = window.location.href
     var anchorElement = selection.anchorNode.parentElement
     var anchorTag = anchorElement.tagName
 
@@ -35,8 +35,8 @@ var getDocumentSelection = () => {
       }
     }
   
-    var start = uri.search('surltag=')
-    var end = uri.search('&surlfocus=')
+    var start = uri.search('surlat=')
+    var end = uri.search('&surlfo=')
     if (end !== -1) {
       end += 1
       for (end; end < uri.length; end++) {
@@ -50,12 +50,13 @@ var getDocumentSelection = () => {
     }
   
     var surl = uri
-    if (surl.search(/\?/i) !== -1) {
+    console.log(surl.lastIndexOf('?'), surl.length - 1)
+    if (surl.lastIndexOf('?') !== surl.length - 1 && surl.lastIndexOf('?') !== -1) {
       surl += '&'
-    } else {
+    } else if (surl.lastIndexOf('?') === -1) {
       surl += '?'
     }
-    // same node
+
     surl += 'surlat=' + String(anchorTag) + '&surlft=' + String(focusTag) + '&surlai=' + String(anchorIndex) + '&surlfi=' + String(focusIndex) + '&surlao=' + anchorOffset + '&surlfo=' + focusOffset 
     console.log(surl)
   
@@ -67,7 +68,6 @@ var getDocumentSelection = () => {
     document.execCommand('copy');
     document.body.removeChild(copyUrl);
   }
-  
 
   return 
 }

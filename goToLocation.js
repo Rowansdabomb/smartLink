@@ -32,28 +32,35 @@ var absoluteOffset = function(element) {
   };
 };
 
-document.commonParent = function(a, b){
-  var pa = [], L;
-  while (a) {
-    pa[pa.length] = a;
-    a = a.parentNode;
-  }
-  L = pa.length;
-  while (b) {  
-    for(var i = 0; i < L; i++){
-      if (pa[i] == b) return b;
+document.commonParent = function(a, b) {
+  if (a === b) {
+    return a.parentNode
+  } else {
+    var pa = [], L;
+    while (a) {
+      pa[pa.length] = a;
+      a = a.parentNode;
     }
-    b = b.parentNode;
+    L = pa.length;
+    while (b) {  
+      for(var i = 0; i < L; i++){
+        if (pa[i] == b) return b;
+      }
+      b = b.parentNode;
+    }
   }
 }
 
 var insertHighlight = (start, startOffset, end, endOffset, nodeList) => {
   for (let i = start; i <= end; i++) {
     var range = document.createRange();
-
     if (i === start) {
       range.setStart(nodeList[i].firstChild, startOffset)
-      range.setEnd(nodeList[i].firstChild, nodeList[i].firstChild.length)
+      if (i === end) {
+        range.setEnd(nodeList[i].firstChild, nodeList[i].firstChild.length)
+      } else {
+        range.setEnd(nodeList[i].firstChild, nodeList[i].firstChild.length)
+      }
     } else if (i === end) {
       range.setStart(nodeList[i].firstChild, 0)
       range.setEnd(nodeList[i].firstChild, endOffset)
@@ -91,6 +98,7 @@ var goToLocation = () => {
 
     var commonParent = document.commonParent(anchorNodes[ai], focusNodes[fi])
     var nodeList = commonParent.children
+    console.log(nodeList)
     var anchorIndex = 0;
     var focusIndex = 0;
     for (let i = 0; i < nodeList.length; i++) {
@@ -102,7 +110,7 @@ var goToLocation = () => {
         focusIndex = i
       }
     }
-    console.log(focusIndex, anchorIndex)
+    console.log(focusIndex, anchorIndex, fo, ao)
     var offset = 0
     if (focusIndex > anchorIndex) {
       offset = absoluteOffset(anchorNodes[ai])
@@ -112,10 +120,10 @@ var goToLocation = () => {
       insertHighlight(focusIndex, fo, anchorIndex, ao, nodeList)
     } else if (fo > ao) {
       offset = absoluteOffset(anchorNodes[ai])
-      insertHighlight(focusIndex, fo, anchorIndex, ao, nodeList)
+      insertHighlight(anchorIndex, ao, focusIndex, fo, nodeList)
     } else {
       offset = absoluteOffset(anchorNodes[ai])
-      insertHighlight(anchorIndex, ao, focusIndex, fo, nodeList)
+      insertHighlight(focusIndex, fo, anchorIndex, ao, nodeList)
     }
 
 
