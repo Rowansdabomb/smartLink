@@ -87,18 +87,13 @@ var goToLocation = () => {
   var fi = getQueryVariable('surlfi')
   var ao = getQueryVariable('surlao')
   var fo = getQueryVariable('surlfo')
-  console.log(at, ft, ai, fi, ao, fo)
+
   if (isDefined(at) && isDefined(ft) && isDefined(ai) && isDefined(fi) && isDefined(ao) && isDefined(fo)) {
     var anchorNodes = document.querySelectorAll(at.toLowerCase());
     var focusNodes = document.querySelectorAll(ft.toLowerCase());
 
-    console.log(anchorNodes[ai], focusNodes[fi])
-    console.log(document.commonParent(focusNodes[fi], anchorNodes[ai]))
-    console.log(document.commonParent(anchorNodes[ai], focusNodes[fi]))
-
     var commonParent = document.commonParent(anchorNodes[ai], focusNodes[fi])
     var nodeList = commonParent.children
-    console.log(nodeList)
     var anchorIndex = 0;
     var focusIndex = 0;
     for (let i = 0; i < nodeList.length; i++) {
@@ -110,7 +105,7 @@ var goToLocation = () => {
         focusIndex = i
       }
     }
-    console.log(focusIndex, anchorIndex, fo, ao)
+
     var offset = 0
     if (focusIndex > anchorIndex) {
       offset = absoluteOffset(anchorNodes[ai])
@@ -143,7 +138,6 @@ var goToLocation = () => {
       parent = parent.parentElement
     }
     if (!foundScroll) {
-      console.log('scrolled on window')
       window.scroll({
         top: offset.top - 100,
         behavior: "auto"

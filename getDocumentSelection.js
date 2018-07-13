@@ -50,7 +50,6 @@ var getDocumentSelection = () => {
     }
   
     var surl = uri
-    console.log(surl.lastIndexOf('?'), surl.length - 1)
     if (surl.lastIndexOf('?') !== surl.length - 1 && surl.lastIndexOf('?') !== -1) {
       surl += '&'
     } else if (surl.lastIndexOf('?') === -1) {
@@ -58,7 +57,6 @@ var getDocumentSelection = () => {
     }
 
     surl += 'surlat=' + String(anchorTag) + '&surlft=' + String(focusTag) + '&surlai=' + String(anchorIndex) + '&surlfi=' + String(focusIndex) + '&surlao=' + anchorOffset + '&surlfo=' + focusOffset 
-    console.log(surl)
   
     // copy surl to clipboard
     var copyUrl = document.createElement("textarea");
