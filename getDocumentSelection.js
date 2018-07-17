@@ -30,17 +30,10 @@ var createSurl = (attributes) => {
     }
   }
   if (start !== -1) {
-    // url = url.replace(url.slice(start, end), '')
-
-    console.log('add next selection')
     let count = 0;
     for (let i = start; i <= end; i++) {
-      console.log(url[i], i)
       if (url[i] === '&' || typeof url[i] === 'undefined') {
-
-        console.log(attributes[count])
-        url = strSplice(url, i, ',' + String(attributes[count]) )
-        console.log(url)
+        url = strSplice(url, i, '_' + String(attributes[count]) )
         i += 1 + String(attributes[count]).length
         end += 1 + String(attributes[count]).length
         count++
@@ -61,7 +54,6 @@ var createSurl = (attributes) => {
   copyUrl.value = surl;
   copyUrl.select();
   document.execCommand('copy');
-  // document.body.removeChild(copyUrl);
 }
 
 var getDocumentSelection = () => {

@@ -1,33 +1,34 @@
 {
-  "name": "Smart Link",
-  "version": "1.0",
-  "description": "Navigate to points of interest on a page",
-  "permissions": ["activeTab", "storage", "contextMenus", "tabs", "declarativeContent"],
-  "background": {
-    "scripts": ["background.js"],
-    "persistent": true
-  },
-  "content_scripts": [{
-    "js": ["goToLocation.js", "getDocumentSelection.js"],
-    "matches": ["http://*/*", "https://*/*"],
-    "css": ["surlStyle.css"],
-    "run_at": "document_end"
-  }],
-  "browser_action":{
-    "default_popup": "popup.html",
-    "default_icon": {
-      "16": "images/Icon-16.png",
-      "32": "images/Icon-32.png",
-      "48": "images/Icon-48.png",
-      "128": "images/Icon-128.png"
-    }
-  },
-  "web_accessible_resources": ["popup.js"],
-  "icons": {
-    "16": "images/Icon-16.png",
-    "32": "images/Icon-32.png",
-    "48": "images/Icon-48.png",
-    "128": "images/Icon-128.png"
-  },
-  "manifest_version": 2
+    "name": "Smart Link",
+    "version": "1.0",
+    "description": "Navigate to points of interest on a page",
+    "permissions": ["activeTab", "storage", "contextMenus", "tabs", "declarativeContent"],
+    "background": {
+        "scripts": ["background.js"],
+        "persistent": true
+    },
+    "content_scripts": [{
+        "js": ["goToLocation.js", "getDocumentSelection.js"],
+        "matches": ["http://*/*", "https://*/*"],
+        "all_frames": true,
+        "css": ["surlStyle.css"],
+        "run_at": "document_end"
+    }],
+    "browser_action": {
+        "default_popup": "popup.html",
+        "default_icon": {
+            "16": "images/Icon-16.png",
+            "32": "images/Icon-32.png",
+            "48": "images/Icon-48.png",
+            "128": "images/Icon-128.png"
+        }
+    },
+    "web_accessible_resources": ["popup.js"],
+    "icons": {
+        "16": "images/Icon-16.png",
+        "32": "images/Icon-32.png",
+        "48": "images/Icon-48.png",
+        "128": "images/Icon-128.png"
+    },
+    "manifest_version": 2
 }

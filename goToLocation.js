@@ -7,7 +7,7 @@ var getQueryVariable = (variable) => {
   for (var i = 0; i < vars.length; i++) {
     var pair = vars[i].split("=");
     if (pair[0] == variable) { 
-      return pair[1].split(','); 
+      return pair[1].split('_'); 
     }
   }
   return false;
@@ -56,11 +56,15 @@ document.commonParent = function(a, b) {
 var insertHighlight = (start, startOffset, end, endOffset, nodeList) => {
   for (let i = start; i <= end; i++) {
     var range = document.createRange();
+    console.log(startOffset, endOffset)
     if (i === start) {
+      console.log('first tag')
       range.setStart(nodeList[i].firstChild, startOffset)
       if (i === end) {
-        range.setEnd(nodeList[i].firstChild, nodeList[i].firstChild.length)
+        console.log('same start and end tag')
+        range.setEnd(nodeList[i].firstChild, endOffset)
       } else {
+        console.log('different start and end tag')
         range.setEnd(nodeList[i].firstChild, nodeList[i].firstChild.length)
       }
     } else if (i === end) {
@@ -82,7 +86,9 @@ var insertHighlight = (start, startOffset, end, endOffset, nodeList) => {
  * Gets Dom element, wraps it with css, and scrolls to it
  */
 
-var goToLocation = (at, ft, ai, fi, ao, fo) => {
+var goToLocation = (attributes, smoothScroll) => {
+  var scrollBehaviour = smoothScroll ? 'smooth': 'auto'
+  var [at, ft, ai, fi, ao, fo] = attributes;
   if (isDefined(at) && isDefined(ft) && isDefined(ai) && isDefined(fi) && isDefined(ao) && isDefined(fo)) {
     var anchorNodes = document.querySelectorAll(at.toLowerCase());
     var focusNodes = document.querySelectorAll(ft.toLowerCase());
@@ -102,17 +108,21 @@ var goToLocation = (at, ft, ai, fi, ao, fo) => {
     }
 
     var offset = 0
+    // different elements, arrange element indexes
     if (focusIndex > anchorIndex) {
       offset = absoluteOffset(anchorNodes[ai])
       insertHighlight(anchorIndex, ao, focusIndex, fo, nodeList)
     } else if (focusIndex < anchorIndex){
       offset = absoluteOffset(focusNodes[fi]),
       insertHighlight(focusIndex, fo, anchorIndex, ao, nodeList)
-    } else if (fo > ao) {
+    } 
+    // same element, arrange offsets
+    else if (fo > ao) {
       offset = absoluteOffset(anchorNodes[ai])
       insertHighlight(anchorIndex, ao, focusIndex, fo, nodeList)
     } else {
       offset = absoluteOffset(anchorNodes[ai])
+      
       insertHighlight(focusIndex, fo, anchorIndex, ao, nodeList)
     }
 
@@ -125,22 +135,16 @@ var goToLocation = (at, ft, ai, fi, ao, fo) => {
       if (overflowY === 'auto' || overflowY === 'scroll') {
         parent.scroll({
           top: offset.top - 100,
-          behavior: "auto"
+          behavior: scrollBehaviour
         })
-        foundScroll = true
-        break
-      }
+      } 
+
       parent = parent.parentElement
-    }
-    if (!foundScroll) {
-      window.scroll({
-        top: offset.top - 100,
-        behavior: "auto"
-      });
-    }
+    } 
   }
 }
 
+var index = 1;
 var at = getQueryVariable('surlat')
 var ft = getQueryVariable('surlft')
 var ai = getQueryVariable('surlai')
@@ -148,4 +152,22 @@ var fi = getQueryVariable('surlfi')
 var ao = getQueryVariable('surlao')
 var fo = getQueryVariable('surlfo')
 
-goToLocation(at, ft, ai, fi, ao, fo)
+goToLocation([at[0], ft[0], ai[0], fi[0], ao[0], fo[0]], false)
+
+chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
+  var data = request.data || {};
+
+  if (data) {
+    index = index + data;
+    if (index < 0) {
+      index = at.length -1
+    } else if (index >= at.length) {
+      index = 0
+    }
+    sendResponse(JSON.stringify({index: index, totalAnchors: at.length, success: true}));
+    goToLocation([at[index], ft[index], ai[index], fi[index], ao[index], fo[index]], true)
+  }
+  else {
+    sendResponse(JSON.stringify({index: null, totalAnchors: 0, success: false}));
+  }  
+});
