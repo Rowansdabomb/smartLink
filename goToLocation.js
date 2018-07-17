@@ -6,13 +6,15 @@ var getQueryVariable = (variable) => {
   var vars = query.split("&");
   for (var i = 0; i < vars.length; i++) {
     var pair = vars[i].split("=");
-    if (pair[0] == variable) { return pair[1]; }
+    if (pair[0] == variable) { 
+      return pair[1].split(','); 
+    }
   }
   return false;
 }
 
 var isDefined = (value) => {
-  if (typeof value !== 'undefined') {
+  if (typeof value !== 'undefined' || value === null || value === false) {
     return true
   }
   return false
@@ -80,14 +82,7 @@ var insertHighlight = (start, startOffset, end, endOffset, nodeList) => {
  * Gets Dom element, wraps it with css, and scrolls to it
  */
 
-var goToLocation = () => {
-  var at = getQueryVariable('surlat')
-  var ft = getQueryVariable('surlft')
-  var ai = getQueryVariable('surlai')
-  var fi = getQueryVariable('surlfi')
-  var ao = getQueryVariable('surlao')
-  var fo = getQueryVariable('surlfo')
-
+var goToLocation = (at, ft, ai, fi, ao, fo) => {
   if (isDefined(at) && isDefined(ft) && isDefined(ai) && isDefined(fi) && isDefined(ao) && isDefined(fo)) {
     var anchorNodes = document.querySelectorAll(at.toLowerCase());
     var focusNodes = document.querySelectorAll(ft.toLowerCase());
@@ -146,4 +141,11 @@ var goToLocation = () => {
   }
 }
 
-goToLocation()
+var at = getQueryVariable('surlat')
+var ft = getQueryVariable('surlft')
+var ai = getQueryVariable('surlai')
+var fi = getQueryVariable('surlfi')
+var ao = getQueryVariable('surlao')
+var fo = getQueryVariable('surlfo')
+
+goToLocation(at, ft, ai, fi, ao, fo)

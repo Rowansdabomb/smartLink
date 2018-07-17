@@ -20,3 +20,10 @@
   right: 10px;
 }
 
+#surlCopy {
+  z-index: 100000;
+  top: 0;
+  position: fixed;
+  width: 100%;
+}   
+

@@ -1,9 +1,73 @@
+var strSplice = (str, index, add) => {
+  if (index < 0) {
+    index = str.length + index;
+    if (index < 0) {
+      index = 0;
+    }
+  }
+
+  return str.slice(0, index) + add + str.slice(index);
+}
+
+var createSurl = (attributes) => {
+  var copyUrl = document.getElementById("surlCopy");
+  try {
+    var url = copyUrl.value
+  } catch {
+    url = window.location.href
+    copyUrl = document.createElement("textarea");
+    copyUrl.id = 'surlCopy';
+    document.body.appendChild(copyUrl);
+  }
+  var start = url.search('surlat=')
+  var end = url.search('&surlfo=')
+  if (end !== -1) {
+    end += 1
+    for (end; end < url.length; end++) {
+      if (url[end] === '&') {
+        break
+      }
+    }
+  }
+  if (start !== -1) {
+    // url = url.replace(url.slice(start, end), '')
+
+    console.log('add next selection')
+    let count = 0;
+    for (let i = start; i <= end; i++) {
+      console.log(url[i], i)
+      if (url[i] === '&' || typeof url[i] === 'undefined') {
+
+        console.log(attributes[count])
+        url = strSplice(url, i, ',' + String(attributes[count]) )
+        console.log(url)
+        i += 1 + String(attributes[count]).length
+        end += 1 + String(attributes[count]).length
+        count++
+      }
+    }
+  }
+
+  var surl = url
+  if (surl.lastIndexOf('?') !== surl.length - 1 && surl.lastIndexOf('?') !== -1) {
+    surl += '&'
+  } else if (surl.lastIndexOf('?') === -1) {
+    surl += '?'
+  }
+
+  surl += 'surlat=' + String(attributes[0]) + '&surlft=' + String(attributes[1]) + '&surlai=' + String(attributes[2]) + '&surlfi=' + String(attributes[3]) + '&surlao=' + attributes[4] + '&surlfo=' + attributes[5] 
+
+  // copy surl to clipboard
+  copyUrl.value = surl;
+  copyUrl.select();
+  document.execCommand('copy');
+  // document.body.removeChild(copyUrl);
+}
+
 var getDocumentSelection = () => {
   var selection = window.getSelection()
   var setup = false
   try {
-    // var uri = selection.anchorNode.baseURI
-    var uri = window.location.href
     var anchorElement = selection.anchorNode.parentElement
     var anchorTag = anchorElement.tagName
 
@@ -13,8 +77,9 @@ var getDocumentSelection = () => {
     var anchorOffset = selection.anchorOffset
     var focusOffset = selection.focusOffset
 
-    var focusNodes = document.querySelectorAll(focusTag);
     var anchorNodes = document.querySelectorAll(anchorTag);
+    var focusNodes = document.querySelectorAll(focusTag);
+
     setup = true
   }
   catch {
@@ -34,37 +99,10 @@ var getDocumentSelection = () => {
         break
       }
     }
-  
-    var start = uri.search('surlat=')
-    var end = uri.search('&surlfo=')
-    if (end !== -1) {
-      end += 1
-      for (end; end < uri.length; end++) {
-        if (uri[end] === '&') {
-          break
-        }
-      }
-    }
-    if (start !== -1) {
-      uri = uri.replace(uri.slice(start, end), '')
-    }
-  
-    var surl = uri
-    if (surl.lastIndexOf('?') !== surl.length - 1 && surl.lastIndexOf('?') !== -1) {
-      surl += '&'
-    } else if (surl.lastIndexOf('?') === -1) {
-      surl += '?'
-    }
+    
+    let attributes = [anchorTag, focusTag, anchorIndex, focusIndex, anchorOffset, focusOffset]
 
-    surl += 'surlat=' + String(anchorTag) + '&surlft=' + String(focusTag) + '&surlai=' + String(anchorIndex) + '&surlfi=' + String(focusIndex) + '&surlao=' + anchorOffset + '&surlfo=' + focusOffset 
-  
-    // copy surl to clipboard
-    var copyUrl = document.createElement("textarea");
-    copyUrl.value = surl;
-    document.body.appendChild(copyUrl);
-    copyUrl.select();
-    document.execCommand('copy');
-    document.body.removeChild(copyUrl);
+    createSurl(attributes)
   }
 
   return 
