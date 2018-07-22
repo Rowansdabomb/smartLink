@@ -57,6 +57,25 @@ var createSurl = (attributes) => {
   document.execCommand('copy');
 }
 
+document.commonParent = function(a, b) {
+  if (a === b) {
+    return a.parentNode
+  } else {
+    var pa = [], L;
+    while (a) {
+      pa[pa.length] = a;
+      a = a.parentNode;
+    }
+    L = pa.length;
+    while (b) {  
+      for (var i = 0; i < L; i++) {
+        if (pa[i] == b) return b
+      }
+      b = b.parentNode;
+    }
+  }
+}
+
 var getDocumentSelection = () => {
   var selection = window.getSelection()
   // console.log(selection.anchorNode, selection.focusNode, selection.toString())
@@ -85,8 +104,8 @@ var getDocumentSelection = () => {
     var anchorOffset = selection.anchorOffset
     var focusOffset = selection.focusOffset
 
-    var anchorNodes = document.querySelectorAll(anchorTag);
-    var focusNodes = document.querySelectorAll(focusTag);
+    var anchorElements = document.querySelectorAll(anchorTag);
+    var focusElements = document.querySelectorAll(focusTag);
 
     setup = true
   }
@@ -96,21 +115,37 @@ var getDocumentSelection = () => {
   }
 
   if (setup) {
-    for (var anchorIndex = 0; anchorIndex < anchorNodes.length; anchorIndex++) {
-      if (anchorNodes[anchorIndex] === anchorElement) {
+
+    // var commonParent = document.commonParent(selection.focusNode, selection.anchorNode)
+    // for (let i = 0; i < commonParent.childNodes.length; i++) {
+    //   if (commonParent.childNodes[i] === selection.focusNode) {
+    //     innerFocusIndex = i
+    //   }
+    //   if (commonParent.childNodes[i] === selection.anchorNode) {
+    //     innerAnchorIndex = i
+    //   }
+    // }
+    // console.log(commonParent, innerAnchorIndex, innerFocusIndex)
+    for (var anchorElementIndex = 0; anchorElementIndex < anchorElements.length; anchorElementIndex++) {
+      if (anchorElements[anchorElementIndex] === anchorElement) {
         break
       }
     }
 
-    for (var focusIndex = 0; focusIndex < focusNodes.length; focusIndex++) {
-      if (focusNodes[focusIndex] === focusElement) {
+    for (var focusElementIndex = 0; focusElementIndex < focusElements.length; focusElementIndex++) {
+      if (focusElements[focusElementIndex] === focusElement) {
         break
       }
     }
+
+    // const parentTag = commonParent.tagName
+    // const parentIndex = document.querySelectorAll(parentTag)
     
-    let attributes = [anchorTag, focusTag, anchorIndex, focusIndex, anchorOffset, focusOffset, innerAnchorIndex, innerFocusIndex]
+    // let attributes = [parentTag, parentIndex, anchorOffset, focusOffset, innerAnchorIndex, innerFocusIndex]
+    
+    let attributes = [anchorTag, focusTag, anchorElementIndex, focusElementIndex, anchorOffset, focusOffset, innerAnchorIndex, innerFocusIndex]
 
-    // let attributes = [anchorTag, focusTag, anchorIndex, focusIndex, anchorOffset, focusOffset]
+    // let attributes = [anchorTag, focusTag, anchorElementIndex, focusElementIndex, anchorOffset, focusOffset]
 
     createSurl(attributes)
   }

@@ -7,7 +7,13 @@ var getData = (variable) => {
   for (var i = 0; i < vars.length; i++) {
     var pair = vars[i].split("=");
     if (pair[0] == variable) { 
-      return pair[1].split('.'); 
+      return pair[1].split('.').map((element, index) => {
+        if (index > 1) {
+          return element.split('_').map((element) => {return Number(element)})
+        } else{
+          return element.split('_')
+        }
+      }); 
     }
   }
   return false;
@@ -53,62 +59,85 @@ document.commonParent = function(a, b) {
   }
 }
 
-var setOffset = (node, offset) => {
-    if (offset === 'surround') {
-      if (node.firstChild) {
-        return node.firstChild
+var setOffset = (node, index) => {
+
+    // if (offset === 'surround') {
+    //   if (node.firstChild) {
+    //     return node.firstChild
+    //   } else {
+    //     return node;
+    //   }
+    // } 
+    // if (node.childNodes.length <= 0) {
+    //   console.log('one node', node)
+    //   return node.firstChild
+    // } else {
+    
+      // console.log('multi node')
+    let i = 0
+    for (let child of node.childNodes) {
+      if (i === index) {
+        console.log('this child right here', child)
+        child = childNode
+        return child
       } else {
-        return node;
+        console.log('nope', child)
       }
-    } 
-    if (node.childNodes.length <= 0) {
-      console.log('one node', node)
-      return node.firstChild
-    } else {
-      console.log('multi node')
-      for (let child of node.childNodes) {
-        console.log('child', child)
-        if (child.length > offset) {
-          console.log(child, child.firstChild, child.nodeType)
-          return child
-        }
-      }
+      i++
     }
+    // node.childNodes.forEach((childNode, i) => {
+      
+    // }) 
+    //   // if (child.length > offset) {
+    //   //   console.log(child, child.firstChild, child.nodeType)
+    //   //   return child
+    //   // }
+    // console.log(child)
     return null
 }
+// // start, startOffset, end, endOffset,
+// var insertHighlight = ([start, startOffset, startIndex, end, endOffset, endIndex], nodeList) => {
+//   for (let i = start; i <= end; i++) {
+//     var range = document.createRange();
+//     console.log('start', start, 'end', end)
+//     console.log(startOffset, endOffset, nodeList[i])
+//     console.log(nodeList[i].childNodes, nodeList[i])
+//     if (i === start) {
+//       // if (nodeList[i].childNodes[startIndex]) {
+//       //   range.setStart(nodeList[i].childNodes[startIndex], startOffset)
+//       // } else {
+//         range.setStart(nodeList[i], startOffset)
+//       // }
+//       // range.setStart(nodeList[i].firstChild, startOffset)
+//       if (i === end) {
+//         // if (nodeList[i].childNodes[endIndex]) {
+//         //   range.setEnd(nodeList[i].childNodes[endIndex], endOffset)
+//         // } else {
+//           range.setEnd(nodeList[i], endOffset)
+//         // }
+//         // range.setEnd(setOffset(nodeList[i], endIndex), endOffset)
+//         // range.setEnd(nodeList[i].firstChild, endOffset)
+//       } else {
+//         range.setEndAfter(setOffset(nodeList[i], endIndex))
+//         // range.setEndAfter(nodeList[i])
+//       }
+//     } else if (i  === end) {
+//       range = setOffset(range, nodeList[i ], 0, true)
+//       range = setOffset(range, nodeList[i ], endOffset, false)
+//     } else {
+//       range = setOffset(range, nodeList[i ], 0, true)
+//       range = setOffset(range, nodeList[i ], 'surround', false)
+//     }
 
-var insertHighlight = (start, startOffset, end, endOffset, nodeList) => {
-  for (let i = start; i <= end; i++) {
-    var range = document.createRange();
-    console.log('start', start, 'end', end)
-    console.log(startOffset, endOffset, nodeList[i])
-    if (i === start) {
-      range.setStart(setOffset(nodeList[i], startOffset), startOffset)
-      // range.setStart(nodeList[i].firstChild, startOffset)
-      if (i === end) {
-        range.setEnd(setOffset(nodeList[i], endOffset), endOffset)
-        // range.setEnd(nodeList[i].firstChild, endOffset)
-      } else {
-        range.setEndAfter(setOffset(nodeList[i], 'surround'))
-        // range.setEndAfter(nodeList[i])
-      }
-    } else if (i  === end) {
-      range = setOffset(range, nodeList[i ], 0, true)
-      range = setOffset(range, nodeList[i ], endOffset, false)
-    } else {
-      range = setOffset(range, nodeList[i ], 0, true)
-      range = setOffset(range, nodeList[i ], 'surround', false)
-    }
-
-    console.log(range)
-    var newNode = document.createElement("div");
-    newNode.className = 'surlHighlight';
+//     console.log(range)
+//     var newNode = document.createElement("div");
+//     newNode.className = 'surlHighlight';
   
-    range.surroundContents(newNode);
-    j = 1;
-  }
+//     range.surroundContents(newNode);
+//     j = 1;
+//   }
 
-}
+// }
 
 /*
  * Gets Dom element, wraps it with css, and scrolls to it
@@ -118,56 +147,88 @@ var goToLocation = (attributes, smoothScroll) => {
   console.log(attributes)
   var scrollBehaviour = smoothScroll ? 'smooth': 'auto'
   var [at, ft, ai, fi, ao, fo, iai, ifi] = attributes;
-  if (isDefined(at) && isDefined(ft) && isDefined(ai) && isDefined(fi) && isDefined(ao) && isDefined(fo)) {
-    var anchorNodes = document.querySelectorAll(at.toLowerCase());
-    var focusNodes = document.querySelectorAll(ft.toLowerCase());
+  // var [pt, pi, ao, fo, iai, ifi] = attributes;
+  if (isDefined(at) && isDefined(ft) && isDefined(ao) && isDefined(fo)) {
+    var anchorElements = document.querySelectorAll(at.toLowerCase());
+    var focusElements = document.querySelectorAll(ft.toLowerCase());
+    // var parentNodes = document.querySelectorAll(pt.toLowerCase())
 
-    var commonParent = document.commonParent(anchorNodes[ai], focusNodes[fi])
-    var nodeList = commonParent.children
+    // var commonParent = document.commonParent(anchorElements[ai], focusElements[fi])
+
+    // var nodeList = commonParent.childNodes
+
+    // var nodeList = parentNodes.childNodes[pt].childNodes
     // console.log(commonParent.children, commonParent.childNodes)
-    var anchorIndex = 0;
-    var focusIndex = 0;
+    // var anchorIndex = 0;
+    // var focusIndex = 0;
 
-    console.log(focusNodes, anchorNodes)
-    for (let i = 0; i < nodeList.length; i++) {
-
-      if (anchorNodes[ai] === nodeList[i]) {
-        anchorIndex = i
-      }
-      if (focusNodes[fi] === nodeList[i]) {
-        focusIndex = i
-      }
-    }
+    console.log(focusElements, anchorElements)
+    // console.log(nodeList)
+    // for (let i = 0; i < nodeList.length; i++) {
+      
+    //   // index of the tag
+    //   if (anchorElements[ai] === nodeList[i]) {
+    //     anchorIndex = i
+    //   }
+    //   if (focusElements[fi] === nodeList[i]) {
+    //     focusIndex = i
+    //   }
+    // }
 
     var offset = 0
+    // var data =[]
     // different nodes, arrange node index
-    if (focusIndex > anchorIndex) {
-      offset = absoluteOffset(anchorNodes[ai])
-      insertHighlight(anchorIndex, ao, focusIndex, fo, nodeList)
-    } else if (focusIndex < anchorIndex){
-      offset = absoluteOffset(focusNodes[fi]),
-      insertHighlight(focusIndex, fo, anchorIndex, ao, nodeList)
-    } 
-    // same node, arrange by child index
-    else if (ifi > iai) {
-      offset = absoluteOffset(anchorNodes[ai])
-      insertHighlight(anchorIndex, ao, focusIndex, fo, nodeList)
-    } else if (iai > ifi) {
-      offset = absoluteOffset(anchorNodes[ai])
-      insertHighlight(focusIndex, fo, anchorIndex, ao, nodeList)
-    }
-    //same child, arrange by caret offset
-    else if (fo > ao) {
-      offset = absoluteOffset(anchorNodes[ai])
-      insertHighlight(anchorIndex, ao, focusIndex, fo, nodeList)
+    // if (focusIndex > anchorIndex) {
+    //   offset = absoluteOffset(anchorElements[ai])
+    //   data = [iai, ao, iai, ifi, fo, ifi]
+    // } else if (focusIndex < anchorIndex){
+    //   offset = absoluteOffset(focusElements[fi])
+    //   data = [ifi, fo, ifi, iai, ao]
+    // } 
+    // // same node, arrange by child index
+    // else if (ifi > iai) {
+    //   offset = absoluteOffset(anchorElements[ai])
+    //   data = [iai, ao, iai, ifi, fo, ifi]
+    // } else if (iai > ifi) {
+    //   offset = absoluteOffset(anchorElements[ai])
+    //   data = [ifi, fo, ifi, iai, ao]
+    // }
+    // //same child, arrange by caret offset
+    // else if (fo > ao) {
+    //   offset = absoluteOffset(anchorElements[ai])
+    //   data = [anchorIndex, ao, iai, focusIndex, fo, ifi]
+    // } else {
+    //   offset = absoluteOffset(anchorElements[ai])
+    //   data = [focusIndex, fo, ifi, anchorIndex, ao, iai]
+    // }
+
+    // insertHighlight(data, nodeList)
+
+    var range = document.createRange();
+    console.log('a>f', anchorElements[ai].contains(focusElements[fi]))
+    console.log('f>a', focusElements[fi].contains(anchorElements[ai]) )
+    if (anchorElements[ai].contains(focusElements[fi])) {
+      // anchorElements[ai].childNodes.indexOf()
+      console.log(focusElements[fi].childNodes[ifi])
+      range.setStart(anchorElements[ai].childNodes[iai], ao)
+      range.setEnd(focusElements[fi].childNodes[ifi], focusElements[fi].childNodes[ifi].length)
+    } else if (focusElements[fi].parentNode === anchorElements[ai]) {
+      range.setStart(focusElements[fi].childNodes[ifi], fo)
+      range.setEndAfter(anchorElements[ai].childNodes[iai])
     } else {
-      offset = absoluteOffset(anchorNodes[ai])
-      insertHighlight(focusIndex, fo, anchorIndex, ao, nodeList)
+      range.setStart(anchorElements[ai].childNodes[iai], ao)
+      range.setEnd(focusElements[fi].childNodes[ifi], fo)
     }
+
+    var newNode = document.createElement("div");
+    newNode.className = 'surlHighlight';
+  
+    range.surroundContents(newNode);
+    console.log(range)
 
 
     // get scrollable element
-    var parent = anchorNodes[ai].parentElement
+    var parent = anchorElements[ai].parentElement
     while (parent !== null) {
       var overflowY = window.getComputedStyle(parent, null).overflowY
       if (overflowY === 'auto' || overflowY === 'scroll') {
@@ -184,16 +245,17 @@ var goToLocation = (attributes, smoothScroll) => {
 
 var index = 1;
 var at, ft, ai, fi, ao, fo, iai, ifi
-[at, ft, ai, fi, ao, fo, iai, ifi] = getData('surldata')
-console.log(getData('surldata'))
+// var pt, pi, ao, fo, iai, ifi
+try {
+  [at, ft, ai, fi, ao, fo, iai, ifi] = getData('surldata')
+  // [pt, pi, ao, fo, iai, ifi] = getData('surlData')
 
-// var ft = getQueryVariable('surlft')
-// var ai = getQueryVariable('surlai')
-// var fi = getQueryVariable('surlfi')
-// var ao = getQueryVariable('surlao')
-// var fo = getQueryVariable('surlfo')
-
-goToLocation([at[0], ft[0], ai[0], fi[0], ao[0], fo[0], iai[0], ifi[0]], false)
+  goToLocation([at[0], ft[0], ai[0], fi[0], ao[0], fo[0], iai[0], ifi[0]], false)
+  // goToLocation([pt[0], pi[0], ao[0], fo[0], iai[0], ifi[0]], false)
+  
+} catch (error) {
+  
+}
 
 chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
   var data = request.data || {};
@@ -206,7 +268,7 @@ chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
       index = 0
     }
     sendResponse(JSON.stringify({index: index, totalAnchors: at.length, success: true}));
-    goToLocation([at[index], ft[index], ai[index], fi[index], ao[index], fo[index]], true)
+    goToLocation([at[index], ft[index], ai[index], fi[index], ao[index], fo[index], iai[index], ifi[index]], true)
   }
   else {
     sendResponse(JSON.stringify({index: null, totalAnchors: 0, success: false}));
