@@ -146,6 +146,7 @@ var getDocumentSelection = () => {
     let attributes = [anchorTag, focusTag, anchorElementIndex, focusElementIndex, anchorOffset, focusOffset, innerAnchorIndex, innerFocusIndex]
 
     // let attributes = [anchorTag, focusTag, anchorElementIndex, focusElementIndex, anchorOffset, focusOffset]
+    console.log(attributes)
 
     createSurl(attributes)
   }

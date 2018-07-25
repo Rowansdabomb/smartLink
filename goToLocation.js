@@ -60,20 +60,6 @@ document.commonParent = function(a, b) {
 }
 
 var setOffset = (node, index) => {
-
-    // if (offset === 'surround') {
-    //   if (node.firstChild) {
-    //     return node.firstChild
-    //   } else {
-    //     return node;
-    //   }
-    // } 
-    // if (node.childNodes.length <= 0) {
-    //   console.log('one node', node)
-    //   return node.firstChild
-    // } else {
-    
-      // console.log('multi node')
     let i = 0
     for (let child of node.childNodes) {
       if (i === index) {
@@ -85,59 +71,15 @@ var setOffset = (node, index) => {
       }
       i++
     }
-    // node.childNodes.forEach((childNode, i) => {
-      
-    // }) 
-    //   // if (child.length > offset) {
-    //   //   console.log(child, child.firstChild, child.nodeType)
-    //   //   return child
-    //   // }
-    // console.log(child)
     return null
 }
-// // start, startOffset, end, endOffset,
-// var insertHighlight = ([start, startOffset, startIndex, end, endOffset, endIndex], nodeList) => {
-//   for (let i = start; i <= end; i++) {
-//     var range = document.createRange();
-//     console.log('start', start, 'end', end)
-//     console.log(startOffset, endOffset, nodeList[i])
-//     console.log(nodeList[i].childNodes, nodeList[i])
-//     if (i === start) {
-//       // if (nodeList[i].childNodes[startIndex]) {
-//       //   range.setStart(nodeList[i].childNodes[startIndex], startOffset)
-//       // } else {
-//         range.setStart(nodeList[i], startOffset)
-//       // }
-//       // range.setStart(nodeList[i].firstChild, startOffset)
-//       if (i === end) {
-//         // if (nodeList[i].childNodes[endIndex]) {
-//         //   range.setEnd(nodeList[i].childNodes[endIndex], endOffset)
-//         // } else {
-//           range.setEnd(nodeList[i], endOffset)
-//         // }
-//         // range.setEnd(setOffset(nodeList[i], endIndex), endOffset)
-//         // range.setEnd(nodeList[i].firstChild, endOffset)
-//       } else {
-//         range.setEndAfter(setOffset(nodeList[i], endIndex))
-//         // range.setEndAfter(nodeList[i])
-//       }
-//     } else if (i  === end) {
-//       range = setOffset(range, nodeList[i ], 0, true)
-//       range = setOffset(range, nodeList[i ], endOffset, false)
-//     } else {
-//       range = setOffset(range, nodeList[i ], 0, true)
-//       range = setOffset(range, nodeList[i ], 'surround', false)
-//     }
 
-//     console.log(range)
-//     var newNode = document.createElement("div");
-//     newNode.className = 'surlHighlight';
-  
-//     range.surroundContents(newNode);
-//     j = 1;
-//   }
-
-// }
+var removeHighlight = (node) => {
+  while(node.firstChild) {
+    node.parentNode.insertBefore(node.firstChild, node)
+  }
+  return null
+}
 
 /*
  * Gets Dom element, wraps it with css, and scrolls to it
@@ -151,73 +93,50 @@ var goToLocation = (attributes, smoothScroll) => {
   if (isDefined(at) && isDefined(ft) && isDefined(ao) && isDefined(fo)) {
     var anchorElements = document.querySelectorAll(at.toLowerCase());
     var focusElements = document.querySelectorAll(ft.toLowerCase());
-    // var parentNodes = document.querySelectorAll(pt.toLowerCase())
-
-    // var commonParent = document.commonParent(anchorElements[ai], focusElements[fi])
-
-    // var nodeList = commonParent.childNodes
-
-    // var nodeList = parentNodes.childNodes[pt].childNodes
-    // console.log(commonParent.children, commonParent.childNodes)
-    // var anchorIndex = 0;
-    // var focusIndex = 0;
-
-    console.log(focusElements, anchorElements)
-    // console.log(nodeList)
-    // for (let i = 0; i < nodeList.length; i++) {
-      
-    //   // index of the tag
-    //   if (anchorElements[ai] === nodeList[i]) {
-    //     anchorIndex = i
-    //   }
-    //   if (focusElements[fi] === nodeList[i]) {
-    //     focusIndex = i
-    //   }
-    // }
 
     var offset = 0
-    // var data =[]
-    // different nodes, arrange node index
-    // if (focusIndex > anchorIndex) {
-    //   offset = absoluteOffset(anchorElements[ai])
-    //   data = [iai, ao, iai, ifi, fo, ifi]
-    // } else if (focusIndex < anchorIndex){
-    //   offset = absoluteOffset(focusElements[fi])
-    //   data = [ifi, fo, ifi, iai, ao]
-    // } 
-    // // same node, arrange by child index
-    // else if (ifi > iai) {
-    //   offset = absoluteOffset(anchorElements[ai])
-    //   data = [iai, ao, iai, ifi, fo, ifi]
-    // } else if (iai > ifi) {
-    //   offset = absoluteOffset(anchorElements[ai])
-    //   data = [ifi, fo, ifi, iai, ao]
-    // }
-    // //same child, arrange by caret offset
-    // else if (fo > ao) {
-    //   offset = absoluteOffset(anchorElements[ai])
-    //   data = [anchorIndex, ao, iai, focusIndex, fo, ifi]
-    // } else {
-    //   offset = absoluteOffset(anchorElements[ai])
-    //   data = [focusIndex, fo, ifi, anchorIndex, ao, iai]
-    // }
-
-    // insertHighlight(data, nodeList)
-
     var range = document.createRange();
-    console.log('a>f', anchorElements[ai].contains(focusElements[fi]))
-    console.log('f>a', focusElements[fi].contains(anchorElements[ai]) )
-    if (anchorElements[ai].contains(focusElements[fi])) {
-      // anchorElements[ai].childNodes.indexOf()
-      console.log(focusElements[fi].childNodes[ifi])
+
+    if (anchorElements[ai].contains(focusElements[fi].parentElement)) {
+      console.log('a>f')
+      // let parent = focusElements[fi].parentElement
+      // while( parent.parentElement !== anchorElements[ai]) {
+      //   parent = parent.parentElement
+      // }
+      // if(anchorElements[ai].indexOf(parent) > iai) {
       range.setStart(anchorElements[ai].childNodes[iai], ao)
-      range.setEnd(focusElements[fi].childNodes[ifi], focusElements[fi].childNodes[ifi].length)
-    } else if (focusElements[fi].parentNode === anchorElements[ai]) {
-      range.setStart(focusElements[fi].childNodes[ifi], fo)
-      range.setEndAfter(anchorElements[ai].childNodes[iai])
-    } else {
-      range.setStart(anchorElements[ai].childNodes[iai], ao)
+      range.setEndBefore(anchorElements[ai].childNodes[iai])
+      // } else {
+      // range.setStartBefore(anchorElements[ai].childNodes[iai])
+      // range.setEnd(anchorElements[ai].childNodes[iai], ao)
+      // }
+      var newNode = document.createElement("div");
+      newNode.className = 'surlHighlight';
+      range.surroundContents(newNode);
+
+      range.setStartBefore(focusElements[fi].childNodes[ifi])
       range.setEnd(focusElements[fi].childNodes[ifi], fo)
+
+    } else if (focusElements[fi].contains(anchorElements[ai].parentElement)) {
+      console.log('f>a')
+      range.setStart(focusElements[fi].childNodes[ifi], fo)
+      range.setEndAfter(focusElements[ai].childNodes[ifi])
+
+      var newNode = document.createElement("div");
+      newNode.className = 'surlHighlight';
+      range.surroundContents(newNode);
+
+      range.setStartBefore(anchorElements[ai].childNodes[iai])
+      range.setEnd(anchorElements[ai].childNodes[iai], ao)
+    } else {
+      if (ao < fo) {
+        range.setStart(anchorElements[ai].childNodes[iai], ao)
+        range.setEnd(focusElements[fi].childNodes[ifi], fo)
+      } else {
+        range.setStart(focusElements[fi].childNodes[ifi], fo)
+        range.setEnd(anchorElements[ai].childNodes[iai], ao)
+      }
+      
     }
 
     var newNode = document.createElement("div");
@@ -225,7 +144,6 @@ var goToLocation = (attributes, smoothScroll) => {
   
     range.surroundContents(newNode);
     console.log(range)
-
 
     // get scrollable element
     var parent = anchorElements[ai].parentElement
@@ -245,13 +163,10 @@ var goToLocation = (attributes, smoothScroll) => {
 
 var index = 1;
 var at, ft, ai, fi, ao, fo, iai, ifi
-// var pt, pi, ao, fo, iai, ifi
 try {
   [at, ft, ai, fi, ao, fo, iai, ifi] = getData('surldata')
-  // [pt, pi, ao, fo, iai, ifi] = getData('surlData')
 
   goToLocation([at[0], ft[0], ai[0], fi[0], ao[0], fo[0], iai[0], ifi[0]], false)
-  // goToLocation([pt[0], pi[0], ao[0], fo[0], iai[0], ifi[0]], false)
   
 } catch (error) {
   

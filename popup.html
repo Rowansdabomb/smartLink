@@ -66,11 +66,18 @@
             border-radius: 24px
         }
         
+        .column {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
         .row {
             display: flex;
             flex-direction: row;
             align-items: center;
             justify-content: space-between;
+            margin-bottom: 10px;
         }
         
         .container {
@@ -82,6 +89,8 @@
         
         .button {
             padding: 4px 8px;
+            min-width: 50px;
+            text-align: center;
             background-color: #2196F3;
             border: 1px solid white;
             border-radius: 3px;
@@ -95,6 +104,13 @@
             cursor: pointer;
         }
         
+        .colorChoice {
+            height: 14px;
+            width: 14px;
+            border-radius: 2px;
+            border: solid 1px black;
+        }
+
         h3,
         p {
             margin: 0 0 10px 0;
@@ -106,12 +122,39 @@
     <div class='container'>
         <h3>This exstension is in Beta</h3>
         <p>Some features may not work as expected...</p>
-        <div class='row'>
+        <!-- <div class='row'>
             <h3>Highlight persist</h3>
             <label class="switch">
           <input id='persistToggle' type="checkbox">
           <span class="slider round"></span>
-        </label>
+        </label> -->
+        </div>
+        <h3>Highlight Color</h3>
+        <div class='row'>
+            <label class='column'>
+                <div class='colorChoice' style="background-color:#ff6700"></div>
+                <input class='colorChoice' name='colorPick' type='radio' value='#ff6700'/>
+            </label>
+            <label class='column'>
+                <div class='colorChoice' style="background-color:#ffd300"></div>
+                <input class='colorChoice' name='colorPick' type='radio' value='#ff6700'/>
+            </label>
+            <label class='column'>
+                <div class='colorChoice' style="background-color:#43ae39"></div>
+                <input class='colorChoice' name='colorPick' type='radio'value='#ff6700'/>
+            </label>
+            <label class='column'>
+                <div class='colorChoice' style="background-color:#aad5ff"></div>
+                <input class='colorChoice' name='colorPick' type='radio'value='#ff6700'/>
+            </label>
+            <label class='column'>
+                <div class='colorChoice' style="background-color:#c92e2e"></div>
+                <input class='colorChoice' name='colorPick' type='radio'value='#ff6700'/>
+            </label>
+            <label class='column'>
+                <div class='colorChoice' style="background-color:transparent"></div>
+                <input class='colorChoice' name='colorPick' type='radio'value='transparent'/>
+            </label>
         </div>
         <div class='row'>
             <div id='prev' class='button'>Prev</div>
