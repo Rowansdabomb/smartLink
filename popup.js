@@ -1,12 +1,13 @@
 function respond(response) {
+  response = JSON.parse(response)
   console.log(response)
   try {
-    if (response.highlightMod) {
-      var {index, totalAnchors, success} = JSON.parse(response.highlightMod)
+    if (response.hMod) {
+      var {index, totalAnchors, success} = response.hMod
 
       anchorTracker.innerText = String(index) + '/' + String(totalAnchors)
-    } else if (response.highlightColor) {
-      console.log(response.highlightColor.success)
+    } else if (response.hColor) {
+      console.log(response.hColor.success)
     } else {
       // this should be initialized on tab load
       
@@ -59,7 +60,7 @@ document.addEventListener('DOMContentLoaded', function() {
   var next = document.getElementById('next');
   next.addEventListener('click', function () {
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-      chrome.tabs.sendMessage(tabs[0].id, {highlightMod: 1}, function(response) {
+      chrome.tabs.sendMessage(tabs[0].id, {hMod: 1}, function(response) {
         respond(response)
       });
     });
@@ -68,7 +69,7 @@ document.addEventListener('DOMContentLoaded', function() {
   var prev = document.getElementById('prev');
   prev.addEventListener('click', function () {
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-      chrome.tabs.sendMessage(tabs[0].id, {highlightMod: -1}, function(response) {
+      chrome.tabs.sendMessage(tabs[0].id, {hMod: -1}, function(response) {
         respond(response)
       });
     });

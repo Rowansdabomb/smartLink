@@ -60,19 +60,28 @@ var setOffset = (node, index) => {
 
 var removeHighlight = (node) => {
   while(node.firstChild) {
-    // console.log(node.parentNode, typeof(node.firstChild), typeof(node))
-    // const html = element.innerHTML
     const parent = node.parentNode
-    // console.log(element, html)
-    // parent = node.parent
     parent.insertBefore(node.firstChild, node)
     parent.removeChild(node)
     parent.normalize()
-    // parent.removeChild(node)
-    // console.log(node.parentNode)
-    // parent.innerHtml = html.concat(parent.innerHtml)
-    // console.log(parent)
+
+    // empty nodes keep popping up
+
+    // for (n of parent.childNodes) {
+    //   console.log(n, n.textContent)
+    //   if (n.textContent === '') {
+    //     parent.removeChild(n)
+    //   }
+    // }
   }
+  return null
+}
+
+var insertHighlight = (range) => {
+  console.log(range)
+  var newNode = document.createElement("div");
+  newNode.className = 'surlHighlight';
+  range.surroundContents(newNode);
   return null
 }
 
@@ -86,9 +95,6 @@ var goToLocation = (attributes, smoothScroll) => {
 
   for (node of document.getElementsByClassName(surlClass)) {
     removeHighlight(node)
-    // console.log(node.childNodes)
-    // console.log(node.children)
-    // node.replaceWith(node.childNodes)
   }
 
   if (isDefined(at) && isDefined(ft) && isDefined(ao) && isDefined(fo)) {
@@ -130,19 +136,57 @@ var goToLocation = (attributes, smoothScroll) => {
       range.setStartBefore(anchorElements[ai].childNodes[iai])
       range.setEnd(anchorElements[ai].childNodes[iai], ao)
     } else {
-      if (ao < fo) {
+      if(ai > fi) {
+        console.log('ai>fi')
+        for (let i = fi; i <= ai; i++) {
+          if (i === fi) {
+            range.setStart(focusElements[fi].childNodes[ifi], fo)
+            range.setEndAfter(focusElements[fi].childNodes[ifi])
+          } else if (i === ai) {
+            range.setStartBefore(anchorElements[ai].childNodes[iai])
+            range.setEnd(anchorElements[ai].childNodes[iai], ao)
+          } else {
+            range.setStartBefore(focusElements[i].firstChild)
+            range.setEndAfter(focusElements[i].lastChild)
+          }
+          insertHighlight(range)
+        }
+      } else if (fi > ai) {
+        console.log('fi>ai')
+        for (let i = ai; i <= fi; i++) {
+          if (i === ai) {
+            range.setStart(anchorElements[ai].childNodes[iai], ao)
+            range.setEndAfter(anchorElements[ai].childNodes[iai])
+          } else if (i === fi) {
+            range.setStartBefore(focusElements[fi].childNodes[ifi])
+            range.setEnd(focusElements[fi].childNodes[ifi], fo)
+          } else {
+            range.setStartBefore(anchorElements[i].firstChild)
+            range.setEndAfter(anchorElements[i].lastChild)
+          }
+          insertHighlight(range)
+        }
+      } else if (ao < fo) {
+        console.log('fo>ao')
         range.setStart(anchorElements[ai].childNodes[iai], ao)
         range.setEnd(focusElements[fi].childNodes[ifi], fo)
+        insertHighlight(range)
       } else {
+        console.log('ao>fo')
         range.setStart(focusElements[fi].childNodes[ifi], fo)
         range.setEnd(anchorElements[ai].childNodes[iai], ao)
+        insertHighlight(range)
       }
     }
 
-    var newNode = document.createElement("div");
-    newNode.className = 'surlHighlight';
-  
-    range.surroundContents(newNode);
+    // var newNode = document.createElement("div");
+    // newNode.className = 'surlHighlight';
+    // try {
+    //   range.surroundContents(newNode);
+    // } catch (InvalidStateError) {
+    //   console.error(InvalidStateError)
+    // }
+    
 
     setColor(highlightColor)
 
@@ -192,7 +236,7 @@ function setColor(color) {
   }
   if (setup) {
     chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
-      var hMod = request.highlightMod || null;
+      var hMod = request.hMod || null;
       var hColor = request.highlightColor || null;
   
       if (hColor) {
@@ -211,7 +255,7 @@ function setColor(color) {
         } else if (index >= attributes[0].length) {
           index = 0
         }
-        sendResponse(JSON.stringify({hMod: {index: index, totalAnchors: attributes[0].length, success: true}}));
+        sendResponse(JSON.stringify({hMod: {index: index + 1, totalAnchors: attributes[0].length, success: true}}));
         goToLocation(attributes.map(a => {return a[index]}), true)
       }
       else {
