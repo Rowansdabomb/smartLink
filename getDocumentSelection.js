@@ -19,66 +19,41 @@ var createSurl = (attributes) => {
     copyUrl.id = 'surlCopy';
     document.body.appendChild(copyUrl);
   }
-  var start = url.search('surlat=')
-  var end = url.search('&surlfo=')
-  if (end !== -1) {
-    end += 1
-    for (end; end < url.length; end++) {
-      if (url[end] === '&') {
-        break
-      }
-    }
-  }
-  if (start !== -1) {
-    let count = 0;
-    for (let i = start; i <= end; i++) {
-      if (url[i] === '&' || typeof url[i] === 'undefined') {
-        url = strSplice(url, i, '_' + String(attributes[count]) )
-        i += 1 + String(attributes[count]).length
-        end += 1 + String(attributes[count]).length
+  url = url.split('&')
+  let index = 0
+  let modified = false
+  for (let chunk of url) {
+    
+    const start = chunk.search('surldata=')
+    if (start >= 0) {
+      chunk = chunk.slice('surldata='.length).split('.')
+      let count = 0;
+      for (let i = 0; i < chunk.length; i++) {
+        chunk[i] += '_' + String(attributes[count])
         count++
       }
-    }
-  }
+      chunk = chunk.join('.')
+      chunk = 'surldata='.concat(chunk)
+      modified = true
+    } 
 
-  var surl = url
-  if (surl.lastIndexOf('?') !== surl.length - 1 && surl.lastIndexOf('?') !== -1) {
-    surl += '&'
-  } else if (surl.lastIndexOf('?') === -1) {
-    surl += '?'
+    url[index] = chunk
+    index++
+    console.log(chunk)
   }
-  surl += 'surldata=' + attributes.join('.')
-  // console.log(surldat)
-  // surl += 'surlat=' + String(attributes[0]) + '&surlft=' + String(attributes[1]) + '&surlai=' + String(attributes[2]) + '&surlfi=' + String(attributes[3]) + '&surlao=' + attributes[4] + '&surlfo=' + attributes[5] + '&surliai=' + attributes[6] + '&surlifi=' + attributes[7]
+  if (!modified) {
+    url.push('surldata='.concat(attributes.join('.')))
+  }
+  url = (url[0].lastIndexOf('?') === -1 ? url.join('?') : url.join('&'))
 
   // copy surl to clipboard
-  copyUrl.value = surl;
+  copyUrl.value = url;
   copyUrl.select();
   document.execCommand('copy');
 }
 
-document.commonParent = function(a, b) {
-  if (a === b) {
-    return a.parentNode
-  } else {
-    var pa = [], L;
-    while (a) {
-      pa[pa.length] = a;
-      a = a.parentNode;
-    }
-    L = pa.length;
-    while (b) {  
-      for (var i = 0; i < L; i++) {
-        if (pa[i] == b) return b
-      }
-      b = b.parentNode;
-    }
-  }
-}
-
 var getDocumentSelection = () => {
   var selection = window.getSelection()
-  // console.log(selection.anchorNode, selection.focusNode, selection.toString())
   var setup = false
   try {
     var anchorElement = selection.anchorNode.parentElement
@@ -110,22 +85,10 @@ var getDocumentSelection = () => {
     setup = true
   }
   catch {
-    // console.warn('no selection made')
     setup = false
   }
 
   if (setup) {
-
-    // var commonParent = document.commonParent(selection.focusNode, selection.anchorNode)
-    // for (let i = 0; i < commonParent.childNodes.length; i++) {
-    //   if (commonParent.childNodes[i] === selection.focusNode) {
-    //     innerFocusIndex = i
-    //   }
-    //   if (commonParent.childNodes[i] === selection.anchorNode) {
-    //     innerAnchorIndex = i
-    //   }
-    // }
-    // console.log(commonParent, innerAnchorIndex, innerFocusIndex)
     for (var anchorElementIndex = 0; anchorElementIndex < anchorElements.length; anchorElementIndex++) {
       if (anchorElements[anchorElementIndex] === anchorElement) {
         break
@@ -137,16 +100,8 @@ var getDocumentSelection = () => {
         break
       }
     }
-
-    // const parentTag = commonParent.tagName
-    // const parentIndex = document.querySelectorAll(parentTag)
-    
-    // let attributes = [parentTag, parentIndex, anchorOffset, focusOffset, innerAnchorIndex, innerFocusIndex]
     
     let attributes = [anchorTag, focusTag, anchorElementIndex, focusElementIndex, anchorOffset, focusOffset, innerAnchorIndex, innerFocusIndex]
-
-    // let attributes = [anchorTag, focusTag, anchorElementIndex, focusElementIndex, anchorOffset, focusOffset]
-    console.log(attributes)
 
     createSurl(attributes)
   }
@@ -155,4 +110,3 @@ var getDocumentSelection = () => {
 }
 
 getDocumentSelection()
-

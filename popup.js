@@ -1,12 +1,15 @@
 function respond(response) {
   console.log(response)
   try {
-    if (response.success) {
-      var {index, totalAnchors, success} = JSON.parse(response)
+    if (response.highlightMod) {
+      var {index, totalAnchors, success} = JSON.parse(response.highlightMod)
 
       anchorTracker.innerText = String(index) + '/' + String(totalAnchors)
+    } else if (response.highlightColor) {
+      console.log(response.highlightColor.success)
     } else {
       // this should be initialized on tab load
+      
       anchorTracker.innerText = 'N/A'
     }
   } catch (error) {
@@ -15,28 +18,48 @@ function respond(response) {
   }
 }
 
+function radioValues(value) {
+  var radios = document.querySelectorAll('input.colorChoice')
+  if (value) {
+    console.log(value)
+    
+  }
+  if (radios) {
+    for (let i = 0; i < radios.length; i++) {
+      console.log(radios[i].value)
+      if (value === radios[i].value) {
+        radios[i].checked = true
+      }
+      radios[i].addEventListener('click', function () {
+        chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+          chrome.tabs.sendMessage(tabs[0].id, {'highlightColor': radios[i].value}, function(response) {
+            respond(response)
+          });
+        });
 
+        chrome.storage.sync.set({
+          'highlightColor': radios[i].value
+        })
+      })
+    }
+  }
+}
 
 document.addEventListener('DOMContentLoaded', function() {
   var anchorTracker = document.getElementById('anchorTracker')
+  
 
-  var radios = document.querySelectorAll('input.colorChoice')
-  let index = 0;
-  for(radio in radios) {
-    radio.addEventListener('click', function () {
-      chrome.tabs.sendMessage(tabs[0].id, {data: index}, function(response) {
-        respond(response)
-      });
-    })
-    index++
-  }
+  chrome.storage.sync.get("highlightColor", function(color) {
+    highlightColor = color.highlightColor
+    radioValues(highlightColor)
+  })
 
-
+  radioValues()
 
   var next = document.getElementById('next');
   next.addEventListener('click', function () {
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-      chrome.tabs.sendMessage(tabs[0].id, {data: 1}, function(response) {
+      chrome.tabs.sendMessage(tabs[0].id, {highlightMod: 1}, function(response) {
         respond(response)
       });
     });
@@ -45,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
   var prev = document.getElementById('prev');
   prev.addEventListener('click', function () {
     chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-      chrome.tabs.sendMessage(tabs[0].id, {data: -1}, function(response) {
+      chrome.tabs.sendMessage(tabs[0].id, {highlightMod: -1}, function(response) {
         respond(response)
       });
     });
