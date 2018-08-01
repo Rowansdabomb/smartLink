@@ -23,7 +23,6 @@ var createSurl = (attributes) => {
   let index = 0
   let modified = false
   for (let chunk of url) {
-    
     const start = chunk.search('surldata=')
     if (start >= 0) {
       chunk = chunk.slice('surldata='.length).split('.')
@@ -36,17 +35,14 @@ var createSurl = (attributes) => {
       chunk = 'surldata='.concat(chunk)
       modified = true
     } 
-
     url[index] = chunk
     index++
-    console.log(chunk)
   }
   if (!modified) {
     url.push('surldata='.concat(attributes.join('.')))
   }
   url = (url[0].lastIndexOf('?') === -1 ? url.join('?') : url.join('&'))
 
-  // copy surl to clipboard
   copyUrl.value = url;
   copyUrl.select();
   document.execCommand('copy');
@@ -82,9 +78,30 @@ var getDocumentSelection = () => {
     var anchorElements = document.querySelectorAll(anchorTag);
     var focusElements = document.querySelectorAll(focusTag);
 
+    const mask = selection.anchorNode.compareDocumentPosition(selection.focusNode)
+    var anchorFirst = true;
+    switch (mask) {
+      case mask & 0:
+        if (anchorOffset > focusOffset)
+          anchorFirst = false
+        break
+      case mask & 1:
+        console.error('the two nodes do not belong to the same document')
+        break
+      case mask & 2:
+        anchorFirst = false
+        break
+      case mask & 4:
+        break
+      case mask & 8:
+        anchorFirst = false
+        break
+      default:
+    }
+    console.log('compDocPos', mask, 'anchor is first', anchorFirst)
     setup = true
-  }
-  catch {
+  } catch (error) {
+    console.warn('Document selection could not be completed: ', error)
     setup = false
   }
 
@@ -100,9 +117,12 @@ var getDocumentSelection = () => {
         break
       }
     }
-    
-    let attributes = [anchorTag, focusTag, anchorElementIndex, focusElementIndex, anchorOffset, focusOffset, innerAnchorIndex, innerFocusIndex]
-
+    if (anchorFirst) {
+      attributes = [anchorTag, focusTag, anchorElementIndex, focusElementIndex, anchorOffset, focusOffset, innerAnchorIndex, innerFocusIndex]
+    } else {
+      attributes = [focusTag, anchorTag, focusElementIndex, anchorElementIndex, focusOffset, anchorOffset, innerFocusIndex, innerAnchorIndex]
+    }
+   
     createSurl(attributes)
   }
 
