@@ -64,21 +64,11 @@ var removeHighlight = (node) => {
     parent.insertBefore(node.firstChild, node)
     parent.removeChild(node)
     parent.normalize()
-
-    // empty nodes keep popping up
-
-    // for (n of parent.childNodes) {
-    //   console.log(n, n.textContent)
-    //   if (n.textContent === '') {
-    //     parent.removeChild(n)
-    //   }
-    // }
   }
   return null
 }
 
 var insertHighlight = (range) => {
-  console.log(range)
   var newNode = document.createElement("div");
   newNode.className = 'surlHighlight';
   range.surroundContents(newNode);
@@ -92,12 +82,12 @@ var insertHighlight = (range) => {
 var goToLocation = (attributes, smoothScroll) => {
   var scrollBehaviour = smoothScroll ? 'smooth': 'auto'
   var [at, ft, ai, fi, ao, fo, iai, ifi] = attributes;
-  console.log(attributes)
 
-  for (node of document.getElementsByClassName(surlClass)) {
-    removeHighlight(node)
+  while (document.getElementsByClassName(surlClass).length > 0) {
+    const nodeList =  document.getElementsByClassName(surlClass)
+    removeHighlight(nodeList[0])
   }
-
+  
   if (isDefined(at) && isDefined(ft) && isDefined(ao) && isDefined(fo)) {
     var anchorElements = document.querySelectorAll(at.toLowerCase());
     var focusElements = document.querySelectorAll(ft.toLowerCase());
@@ -135,19 +125,21 @@ var goToLocation = (attributes, smoothScroll) => {
       range.setEndAfter(anchorElements[ai].childNodes[iai])
       insertHighlight(range)
       let next = anchorElements[ai].nextSibling
-      while(!next.contains(focusElements[fi].childNodes[ifi])) {
-        range.setStartBefore(next.firstChild)
-        range.setEndAfter(next.lastChild)
-        insertHighlight(range)
-        next = next.nextSibling
-      }
-      next = next.firstChild
-      while (next && !next.contains(focusElements[fi].childNodes[ifi])) {
-        console.log(next)
-        range.setStartBefore(next)
-        range.setEndAfter(next)
-        insertHighlight(range)
-        next = next.nextSibling
+      if (next) {
+        while(!next.contains(focusElements[fi].childNodes[ifi])) {
+          range.setStartBefore(next.firstChild)
+          range.setEndAfter(next.lastChild)
+          insertHighlight(range)
+          next = next.nextSibling
+        }
+        next = next.firstChild
+        while (next && !next.contains(focusElements[fi].childNodes[ifi])) {
+          // console.log(next)
+          range.setStartBefore(next)
+          range.setEndAfter(next)
+          insertHighlight(range)
+          next = next.nextSibling
+        }
       }
     } else if (fi > ai) {
       console.log('fi>ai')
@@ -165,7 +157,6 @@ var goToLocation = (attributes, smoothScroll) => {
         insertHighlight(range)
       }
     } else {
-      console.log('else')
       range.setStart(anchorElements[ai].childNodes[iai], ao)
       range.setEnd(focusElements[fi].childNodes[ifi], fo)
       insertHighlight(range)
@@ -179,13 +170,11 @@ var goToLocation = (attributes, smoothScroll) => {
     while (parent !== null) {
       var overflowY = window.getComputedStyle(parent, null).overflowY
       if (overflowY === 'auto' || overflowY === 'scroll') {
-        console.log(parent)
         parent.scroll({
           top: offset.top - 100,
           behavior: scrollBehaviour
         })
       } 
-
       parent = parent.parentElement
     } 
   }
@@ -221,7 +210,6 @@ if (setup) {
     var hColor = request.highlightColor || null;
 
     if (hColor) {
-      console.log(hColor)
       sendResponse(JSON.stringify({hColor: {success: true}}));
 
       highlightColor = hColor
@@ -230,7 +218,6 @@ if (setup) {
 
     if (hMod) {
       index = index + hMod;
-      console.log(index, attributes[0])
       if (index < 0) {
         index = attributes[0].length - 1
       } else if (index >= attributes[0].length) {

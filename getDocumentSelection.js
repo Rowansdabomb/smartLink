@@ -12,9 +12,11 @@ var strSplice = (str, index, add) => {
 var createSurl = (attributes) => {
   var copyUrl = document.getElementById("surlCopy");
   try {
-    var url = copyUrl.value
+    var url = copyUrl.value.split('?')
+    url = '?' + url[1]
   } catch {
-    url = window.location.href
+    console.log(window.location)
+    url = window.location.search
     copyUrl = document.createElement("textarea");
     copyUrl.id = 'surlCopy';
     document.body.appendChild(copyUrl);
@@ -35,13 +37,18 @@ var createSurl = (attributes) => {
       chunk = 'surldata='.concat(chunk)
       modified = true
     } 
+    if (chunk[0] !== '?' && index !==0) {
+      chunk = '&' + chunk
+    }
     url[index] = chunk
     index++
   }
   if (!modified) {
-    url.push('surldata='.concat(attributes.join('.')))
+    url.push('&surldata='.concat(attributes.join('.')))
   }
-  url = (url[0].lastIndexOf('?') === -1 ? url.join('?') : url.join('&'))
+  
+  url.unshift(window.location.origin + window.location.pathname)
+  url =  url.join('')
 
   copyUrl.value = url;
   copyUrl.select();
@@ -98,7 +105,6 @@ var getDocumentSelection = () => {
         break
       default:
     }
-    console.log('compDocPos', mask, 'anchor is first', anchorFirst)
     setup = true
   } catch (error) {
     console.warn('Document selection could not be completed: ', error)
