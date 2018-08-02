@@ -75,6 +75,29 @@ var insertHighlight = (range) => {
   return null
 }
 
+function getTextNodesBetween(rootNode, startNode, endNode) {
+  var pastStartNode = false, reachedEndNode = false, textNodes = [];
+
+  function getTextNodes(node) {
+      if (node == startNode) {
+          pastStartNode = true;
+      } else if (node == endNode) {
+          reachedEndNode = true;
+      } else if (node.nodeType == 3) {
+          if (pastStartNode && !reachedEndNode && !/^\s*$/.test(node.nodeValue)) {
+              textNodes.push(node);
+          }
+      } else {
+          for (var i = 0, len = node.childNodes.length; !reachedEndNode && i < len; ++i) {
+              getTextNodes(node.childNodes[i]);
+          }
+      }
+  }
+
+  getTextNodes(rootNode);
+  return textNodes;
+}
+
 /*
  * Gets Dom element, wraps it with css, and scrolls to it
  */
@@ -95,72 +118,100 @@ var goToLocation = (attributes, smoothScroll) => {
     var offset = 0
     var range = document.createRange();
 
-    if (anchorElements[ai].contains(focusElements[fi].parentElement)) {
-      console.log('a>f')
-      range.setStartBefore(focusElements[fi].childNodes[ifi])
+    console.log(anchorElements[ai], focusElements[fi])
+
+    if (anchorElements[ai].childNodes[iai] === focusElements[fi].childNodes[ifi]) {
+      range.setStart(anchorElements[ai].childNodes[iai], ao)
       range.setEnd(focusElements[fi].childNodes[ifi], fo)
       insertHighlight(range)
-
-      let child = focusElements[fi]
-      let parent = child.parentElement
-      
-      while(parent !== anchorElements[ai]) {
-        range.setStartBefore(parent.firstChild)
-        range.setEndBefore(child)
-        child = parent
-        parent = parent.parentElement
-        insertHighlight(range)
-      }
-      range.setStart(anchorElements[ai].childNodes[iai], ao)
-      range.setEndAfter(anchorElements[ai].childNodes[iai])
-
-      insertHighlight(range)
-    } else if (at !== ft) {
-      console.log('at!==ft')
-      range.setStartBefore(focusElements[fi].childNodes[ifi])
-      range.setEnd(focusElements[fi].childNodes[ifi], fo)
-      insertHighlight(range)
-
-      range.setStart(anchorElements[ai].childNodes[iai], ao)
-      range.setEndAfter(anchorElements[ai].childNodes[iai])
-      insertHighlight(range)
-      let next = anchorElements[ai].nextSibling
-      if (next) {
-        while(!next.contains(focusElements[fi].childNodes[ifi])) {
-          range.setStartBefore(next.firstChild)
-          range.setEndAfter(next.lastChild)
-          insertHighlight(range)
-          next = next.nextSibling
-        }
-        next = next.firstChild
-        while (next && !next.contains(focusElements[fi].childNodes[ifi])) {
-          // console.log(next)
-          range.setStartBefore(next)
-          range.setEndAfter(next)
-          insertHighlight(range)
-          next = next.nextSibling
-        }
-      }
-    } else if (fi > ai) {
-      console.log('fi>ai')
-      for (let i = ai; i <= fi; i++) {
-        if (i === ai) {
-          range.setStart(anchorElements[ai].childNodes[iai], ao)
-          range.setEndAfter(anchorElements[ai].childNodes[iai])
-        } else if (i === fi) {
-          range.setStartBefore(focusElements[fi].childNodes[ifi])
-          range.setEnd(focusElements[fi].childNodes[ifi], fo)
-        } else {
-          range.setStartBefore(anchorElements[i].firstChild)
-          range.setEndAfter(anchorElements[i].lastChild)
-        }
-        insertHighlight(range)
-      }
     } else {
+      var textNodes = getTextNodesBetween(document.body, anchorElements[ai].childNodes[iai], focusElements[fi].childNodes[ifi]);
+
       range.setStart(anchorElements[ai].childNodes[iai], ao)
-      range.setEnd(focusElements[fi].childNodes[ifi], fo)
+      range.setEndAfter(anchorElements[ai].childNodes[iai])
       insertHighlight(range)
-    } 
+  
+      let count = 0
+      for (let node of textNodes) {
+        if (focusElements[fi].contains(node)) {
+          count++
+        }
+        range.selectNodeContents(node)
+        insertHighlight(range)
+      }
+  
+      console.log(textNodes, focusElements[fi].childNodes, ifi, fo)
+      range.setStartBefore(focusElements[fi].childNodes[ifi + count])
+      range.setEnd(focusElements[fi].childNodes[ifi + count], fo)
+      insertHighlight(range)
+    }
+
+    // if (anchorElements[ai].contains(focusElements[fi].parentElement)) {
+    //   console.log('a>f')
+    //   range.setStartBefore(focusElements[fi].childNodes[ifi])
+    //   range.setEnd(focusElements[fi].childNodes[ifi], fo)
+    //   insertHighlight(range)
+
+    //   let child = focusElements[fi]
+    //   let parent = child.parentElement
+      
+    //   while(parent !== anchorElements[ai]) {
+    //     range.setStartBefore(parent.firstChild)
+    //     range.setEndBefore(child)
+    //     child = parent
+    //     parent = parent.parentElement
+    //     insertHighlight(range)
+    //   }
+    //   range.setStart(anchorElements[ai].childNodes[iai], ao)
+    //   range.setEndAfter(anchorElements[ai].childNodes[iai])
+
+    //   insertHighlight(range)
+    // } else if (at !== ft) {
+    //   console.log('at!==ft')
+    //   range.setStartBefore(focusElements[fi].childNodes[ifi])
+    //   range.setEnd(focusElements[fi].childNodes[ifi], fo)
+    //   insertHighlight(range)
+
+    //   range.setStart(anchorElements[ai].childNodes[iai], ao)
+    //   range.setEndAfter(anchorElements[ai].childNodes[iai])
+    //   insertHighlight(range)
+    //   let next = anchorElements[ai].nextSibling
+    //   if (next) {
+    //     while(!next.contains(focusElements[fi].childNodes[ifi])) {
+    //       range.setStartBefore(next.firstChild)
+    //       range.setEndAfter(next.lastChild)
+    //       insertHighlight(range)
+    //       next = next.nextSibling
+    //     }
+    //     next = next.firstChild
+    //     while (next && !next.contains(focusElements[fi].childNodes[ifi])) {
+    //       // console.log(next)
+    //       range.setStartBefore(next)
+    //       range.setEndAfter(next)
+    //       insertHighlight(range)
+    //       next = next.nextSibling
+    //     }
+    //   }
+    // } else if (fi > ai) {
+    //   console.log('fi>ai')
+    //   for (let i = ai; i <= fi; i++) {
+    //     if (i === ai) {
+    //       range.setStart(anchorElements[ai].childNodes[iai], ao)
+    //       range.setEndAfter(anchorElements[ai].childNodes[iai])
+    //     } else if (i === fi) {
+    //       range.setStartBefore(focusElements[fi].childNodes[ifi])
+    //       range.setEnd(focusElements[fi].childNodes[ifi], fo)
+    //     } else {
+    //       range.setStartBefore(anchorElements[i].firstChild)
+    //       range.setEndAfter(anchorElements[i].lastChild)
+    //     }
+    //     insertHighlight(range)
+    //   }
+    // } else {
+    //   range.setStart(anchorElements[ai].childNodes[iai], ao)
+    //   range.setEnd(focusElements[fi].childNodes[ifi], fo)
+    //   insertHighlight(range)
+    // } 
 
     setColor(highlightColor)
     offset = absoluteOffset(anchorElements[ai])
