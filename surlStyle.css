@@ -14,8 +14,8 @@
 }
 
 #surlCopy {
-    z-index: 100000;
-    top: 0;
+    z-index: 10;
+    top: 0px;
     position: fixed;
     width: 100%;
 }

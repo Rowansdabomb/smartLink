@@ -1,5 +1,5 @@
-let highlightColor = 'yellow'
 const surlClass = 'surlHighlight'
+let highlightColor = 'yellow'
 
 /*
  * Unpacks varibales from the url
@@ -27,6 +27,13 @@ var isDefined = (value) => {
     return true
   }
   return false
+}
+
+var insertHighlight = (range) => {
+  var newNode = document.createElement("div");
+  newNode.className = surlClass;
+  range.surroundContents(newNode);
+  return null
 }
 
 var absoluteOffset = function(element) {
@@ -68,17 +75,10 @@ var removeHighlight = (node) => {
   return null
 }
 
-var insertHighlight = (range) => {
-  var newNode = document.createElement("div");
-  newNode.className = 'surlHighlight';
-  range.surroundContents(newNode);
-  return null
-}
-
-function getTextNodesBetween(rootNode, startNode, endNode) {
+var getTextNodesBetween = (rootNode, startNode, endNode) => {
   var pastStartNode = false, reachedEndNode = false, textNodes = [];
 
-  function getTextNodes(node) {
+  var getTextNodes = (node) => {
       if (node == startNode) {
           pastStartNode = true;
       } else if (node == endNode) {
@@ -102,116 +102,52 @@ function getTextNodesBetween(rootNode, startNode, endNode) {
  * Gets Dom element, wraps it with css, and scrolls to it
  */
 
+
 var goToLocation = (attributes, smoothScroll) => {
   var scrollBehaviour = smoothScroll ? 'smooth': 'auto'
   var [at, ft, ai, fi, ao, fo, iai, ifi] = attributes;
 
-  while (document.getElementsByClassName(surlClass).length > 0) {
-    const nodeList =  document.getElementsByClassName(surlClass)
-    removeHighlight(nodeList[0])
-  }
+  // while (document.getElementsByClassName(surlClass).length > 0) {
+  //   const nodeList =  document.getElementsByClassName(surlClass)
+  //   removeHighlight(nodeList[0])
+  // }
   
   if (isDefined(at) && isDefined(ft) && isDefined(ao) && isDefined(fo)) {
     var anchorElements = document.querySelectorAll(at.toLowerCase());
     var focusElements = document.querySelectorAll(ft.toLowerCase());
 
+    var range = document.createRange()
     var offset = 0
-    var range = document.createRange();
-
-    console.log(anchorElements[ai], focusElements[fi])
+    
+    // highlightSelection(anchorElements[ai].childNodes[iai], focusElements[fi].childNodes[ifi])
 
     if (anchorElements[ai].childNodes[iai] === focusElements[fi].childNodes[ifi]) {
       range.setStart(anchorElements[ai].childNodes[iai], ao)
       range.setEnd(focusElements[fi].childNodes[ifi], fo)
       insertHighlight(range)
     } else {
-      var textNodes = getTextNodesBetween(document.body, anchorElements[ai].childNodes[iai], focusElements[fi].childNodes[ifi]);
+      let textNodes = getTextNodesBetween(document.body, anchorElements[ai].childNodes[iai], focusElements[fi].childNodes[ifi]);
 
       range.setStart(anchorElements[ai].childNodes[iai], ao)
       range.setEndAfter(anchorElements[ai].childNodes[iai])
       insertHighlight(range)
-  
-      let count = 0
-      for (let node of textNodes) {
-        if (focusElements[fi].contains(node)) {
-          count++
+      if (textNodes.length > 0) {
+        let count = 0
+        for (let node of textNodes) {
+          if (focusElements[fi].contains(node)) {
+            count++
+          }
+          range.selectNodeContents(node)
+          insertHighlight(range)
         }
-        range.selectNodeContents(node)
+    
+        // console.log(textNodes, focusElements[fi].childNodes, ifi, fo)
+        range.setStartBefore(focusElements[fi].childNodes[ifi + count])
+        range.setEnd(focusElements[fi].childNodes[ifi + count], fo)
         insertHighlight(range)
       }
-  
-      console.log(textNodes, focusElements[fi].childNodes, ifi, fo)
-      range.setStartBefore(focusElements[fi].childNodes[ifi + count])
-      range.setEnd(focusElements[fi].childNodes[ifi + count], fo)
-      insertHighlight(range)
+
     }
-
-    // if (anchorElements[ai].contains(focusElements[fi].parentElement)) {
-    //   console.log('a>f')
-    //   range.setStartBefore(focusElements[fi].childNodes[ifi])
-    //   range.setEnd(focusElements[fi].childNodes[ifi], fo)
-    //   insertHighlight(range)
-
-    //   let child = focusElements[fi]
-    //   let parent = child.parentElement
-      
-    //   while(parent !== anchorElements[ai]) {
-    //     range.setStartBefore(parent.firstChild)
-    //     range.setEndBefore(child)
-    //     child = parent
-    //     parent = parent.parentElement
-    //     insertHighlight(range)
-    //   }
-    //   range.setStart(anchorElements[ai].childNodes[iai], ao)
-    //   range.setEndAfter(anchorElements[ai].childNodes[iai])
-
-    //   insertHighlight(range)
-    // } else if (at !== ft) {
-    //   console.log('at!==ft')
-    //   range.setStartBefore(focusElements[fi].childNodes[ifi])
-    //   range.setEnd(focusElements[fi].childNodes[ifi], fo)
-    //   insertHighlight(range)
-
-    //   range.setStart(anchorElements[ai].childNodes[iai], ao)
-    //   range.setEndAfter(anchorElements[ai].childNodes[iai])
-    //   insertHighlight(range)
-    //   let next = anchorElements[ai].nextSibling
-    //   if (next) {
-    //     while(!next.contains(focusElements[fi].childNodes[ifi])) {
-    //       range.setStartBefore(next.firstChild)
-    //       range.setEndAfter(next.lastChild)
-    //       insertHighlight(range)
-    //       next = next.nextSibling
-    //     }
-    //     next = next.firstChild
-    //     while (next && !next.contains(focusElements[fi].childNodes[ifi])) {
-    //       // console.log(next)
-    //       range.setStartBefore(next)
-    //       range.setEndAfter(next)
-    //       insertHighlight(range)
-    //       next = next.nextSibling
-    //     }
-    //   }
-    // } else if (fi > ai) {
-    //   console.log('fi>ai')
-    //   for (let i = ai; i <= fi; i++) {
-    //     if (i === ai) {
-    //       range.setStart(anchorElements[ai].childNodes[iai], ao)
-    //       range.setEndAfter(anchorElements[ai].childNodes[iai])
-    //     } else if (i === fi) {
-    //       range.setStartBefore(focusElements[fi].childNodes[ifi])
-    //       range.setEnd(focusElements[fi].childNodes[ifi], fo)
-    //     } else {
-    //       range.setStartBefore(anchorElements[i].firstChild)
-    //       range.setEndAfter(anchorElements[i].lastChild)
-    //     }
-    //     insertHighlight(range)
-    //   }
-    // } else {
-    //   range.setStart(anchorElements[ai].childNodes[iai], ao)
-    //   range.setEnd(focusElements[fi].childNodes[ifi], fo)
-    //   insertHighlight(range)
-    // } 
 
     setColor(highlightColor)
     offset = absoluteOffset(anchorElements[ai])
@@ -222,7 +158,7 @@ var goToLocation = (attributes, smoothScroll) => {
       var overflowY = window.getComputedStyle(parent, null).overflowY
       if (overflowY === 'auto' || overflowY === 'scroll') {
         parent.scroll({
-          top: offset.top - 100,
+          top: offset.top - 200,
           behavior: scrollBehaviour
         })
       } 
@@ -231,11 +167,15 @@ var goToLocation = (attributes, smoothScroll) => {
   }
 }
 
-function setColor(color) {
-  for (selection of document.getElementsByClassName(surlClass)) {
+function setColor() {
+  for (let selection of document.getElementsByClassName(surlClass)) {
     selection.style.backgroundColor = highlightColor
   }
 }
+
+///////////////////////////////////////////////////////////////////////////
+//////////////////////////////  MAIN  /////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
 
 let index = 0;
 let attributes = []
