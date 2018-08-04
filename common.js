@@ -76,7 +76,7 @@ var checkAlreadyInserted = (nodeList) => {
   return false
 }
 
-var highlightSelection = (attributes) => {
+var highlightSelection = (attributes, select) => {
   var [at, ft, ai, fi, ao, fo, iai, ifi] = attributes;
 
   var anchorElements = document.querySelectorAll(at.toLowerCase());
@@ -87,12 +87,14 @@ var highlightSelection = (attributes) => {
 
   if (!alreadyInserted) {
     if (anchorElements[ai].childNodes[iai] === focusElements[fi].childNodes[ifi]) {
+      console.log('nodes are same')
       range.setStart(anchorElements[ai].childNodes[iai], ao)
       range.setEnd(focusElements[fi].childNodes[ifi], fo)
       insertHighlight(range)
     } else {
+      console.log('nodes are different')
       let textNodes = getTextNodesBetween(document.body, anchorElements[ai].childNodes[iai], focusElements[fi].childNodes[ifi]);
-    
+      console.log(textNodes)
       range.setStart(anchorElements[ai].childNodes[iai], ao)
       range.setEndAfter(anchorElements[ai].childNodes[iai])
       insertHighlight(range)
@@ -105,13 +107,21 @@ var highlightSelection = (attributes) => {
           range.selectNodeContents(node)
           insertHighlight(range)
         }
-    
         range.setStartBefore(focusElements[fi].childNodes[ifi + count])
         range.setEnd(focusElements[fi].childNodes[ifi + count], fo)
         insertHighlight(range)
+      } else {
+        range.setStartBefore(focusElements[fi].childNodes[ifi])
+        range.setEnd(focusElements[fi].childNodes[ifi], fo)
+        insertHighlight(range)
       }
+
     }
+  } else if (select) {
+    alert('Currently SmartLinks does not support mulitple selections within the same element')
+    return false
   }
 
   setColor(highlightColor)
+  return true
 }

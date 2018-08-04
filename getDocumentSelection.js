@@ -63,7 +63,7 @@ var createSurl = (attributes) => {
   url = url.join('')
 
   copyUrl.value = url;
-  // console.log(copyUrl.value)
+  console.log(copyUrl.value)
   copyUrl.select();
   document.execCommand('copy');
 }
@@ -86,17 +86,18 @@ var getDocumentSelection = () => {
   try {
     var anchorElement = selection.anchorNode.parentElement
     var anchorTag = anchorElement.tagName
-    var innerAnchorIndex = getInnerIndex(anchorElement.childNodes, selection.anchorNode)
-
+    
     var focusElement = selection.focusNode.parentElement
     var focusTag = focusElement.tagName
-    var innerFocusIndex = getInnerIndex(focusElement.childNodes, selection.focusNode)
-
+    
     var anchorOffset = selection.anchorOffset
     var focusOffset = selection.focusOffset
 
     var anchorElements = document.querySelectorAll(anchorTag);
     var focusElements = document.querySelectorAll(focusTag);
+
+    var innerAnchorIndex = getInnerIndex(anchorElement.childNodes, selection.anchorNode)
+    var innerFocusIndex = getInnerIndex(focusElement.childNodes, selection.focusNode)
 
     const mask = selection.anchorNode.compareDocumentPosition(selection.focusNode)
     var anchorFirst = true;
@@ -118,6 +119,7 @@ var getDocumentSelection = () => {
         break
       default:
     }
+
     setup = true
   } catch (error) {
     console.warn('Document selection could not be completed: ', error)
@@ -136,16 +138,17 @@ var getDocumentSelection = () => {
         break
       }
     }
+
     if (anchorFirst) {
       attributes = [anchorTag, focusTag, anchorElementIndex, focusElementIndex, anchorOffset, focusOffset, innerAnchorIndex, innerFocusIndex]
     } else {
       attributes = [focusTag, anchorTag, focusElementIndex, anchorElementIndex, focusOffset, anchorOffset, innerFocusIndex, innerAnchorIndex]
     }
-    highlightSelection(attributes)
 
-    createSurl(attributes)
+    if (highlightSelection(attributes, true)) {
+      createSurl(attributes)
+    }
   }
-
   return 
 }
 
