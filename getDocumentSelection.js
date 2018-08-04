@@ -9,36 +9,6 @@ var strSplice = (str, index, add) => {
   return str.slice(0, index) + add + str.slice(index);
 }
 
-var insertHighlight = (range) => {
-  var newNode = document.createElement("div");
-  newNode.className = 'surlHighlight';
-  range.surroundContents(newNode);
-  return null
-}
-
-var getTextNodesBetween = (rootNode, startNode, endNode) => {
-  var pastStartNode = false, reachedEndNode = false, textNodes = [];
-
-  var getTextNodes = (node) => {
-      if (node == startNode) {
-          pastStartNode = true;
-      } else if (node == endNode) {
-          reachedEndNode = true;
-      } else if (node.nodeType == 3) {
-          if (pastStartNode && !reachedEndNode && !/^\s*$/.test(node.nodeValue)) {
-              textNodes.push(node);
-          }
-      } else {
-          for (var i = 0, len = node.childNodes.length; !reachedEndNode && i < len; ++i) {
-              getTextNodes(node.childNodes[i]);
-          }
-      }
-  }
-
-  getTextNodes(rootNode);
-  return textNodes;
-}
-
 var createSurl = (attributes) => {
   var copyUrl = document.getElementById("surlCopy");
   try {
@@ -52,7 +22,9 @@ var createSurl = (attributes) => {
     document.body.appendChild(copyUrl);
   }
   url = url.split('&')
-  console.log(url)
+  if (url.length === 1 && url[0] === '') {
+    url = []
+  }
   let index = 0
   let modified = false
   for (let chunk of url) {
@@ -75,61 +47,37 @@ var createSurl = (attributes) => {
     } 
     if (index === 0) {
       chunk = chunk.replace('&', '?')
-      console.log(index, chunk[0])
     }
     url[index] = chunk
     index++
   }
   if (!modified) {
-    if (url.length > 1) {
+    if (url.length > 0) {
       url.push('&surldata='.concat(attributes.join('.')))
     } else {
       url.push('?surldata='.concat(attributes.join('.')))
     }
-    
   }
   
   url.unshift(window.location.origin + window.location.pathname)
-  url =  url.join('')
+  url = url.join('')
 
   copyUrl.value = url;
+  // console.log(copyUrl.value)
   copyUrl.select();
   document.execCommand('copy');
-  // copyUrl.parentNode.removeChild(copyUrl)
 }
 
-var highlightSelection = (attributes) => {
-  var [at, ft, ai, fi, ao, fo, iai, ifi] = attributes;
-
-  var anchorElements = document.querySelectorAll(at.toLowerCase());
-  var focusElements = document.querySelectorAll(ft.toLowerCase());
-  var range = document.createRange();
-
-  if (anchorElements[ai].childNodes[iai] === focusElements[fi].childNodes[ifi]) {
-    range.setStart(anchorElements[ai].childNodes[iai], ao)
-    range.setEnd(focusElements[fi].childNodes[ifi], fo)
-    insertHighlight(range)
-  } else {
-    let textNodes = getTextNodesBetween(document.body, anchorElements[ai].childNodes[iai], focusElements[fi].childNodes[ifi]);
-  
-    range.setStart(anchorElements[ai].childNodes[iai], ao)
-    range.setEndAfter(anchorElements[ai].childNodes[iai])
-    insertHighlight(range)
-    if (textNodes.length > 0) {
-      let count = 0
-      for (let node of textNodes) {
-        if (focusElements[fi].contains(node)) {
-          count++
-        }
-        range.selectNodeContents(node)
-        insertHighlight(range)
-      }
-  
-      range.setStartBefore(focusElements[fi].childNodes[ifi + count])
-      range.setEnd(focusElements[fi].childNodes[ifi + count], fo)
-      insertHighlight(range)
+getInnerIndex = (nodeList, target) => {
+  let index = 0
+  for (let node of nodeList) {
+    if (node === target) {
+      break
     }
+    index++
   }
+
+  return index
 }
 
 var getDocumentSelection = () => {
@@ -138,23 +86,11 @@ var getDocumentSelection = () => {
   try {
     var anchorElement = selection.anchorNode.parentElement
     var anchorTag = anchorElement.tagName
-    var innerAnchorIndex = 0
-    for (let node of anchorElement.childNodes) {
-      if (node === selection.anchorNode) {
-        break
-      }
-      innerAnchorIndex++
-    }
+    var innerAnchorIndex = getInnerIndex(anchorElement.childNodes, selection.anchorNode)
 
     var focusElement = selection.focusNode.parentElement
     var focusTag = focusElement.tagName
-    var innerFocusIndex = 0
-    for (let node of focusElement.childNodes) {
-      if (node === selection.focusNode) {
-        break
-      }
-      innerFocusIndex++
-    }
+    var innerFocusIndex = getInnerIndex(focusElement.childNodes, selection.focusNode)
 
     var anchorOffset = selection.anchorOffset
     var focusOffset = selection.focusOffset
@@ -213,4 +149,5 @@ var getDocumentSelection = () => {
   return 
 }
 
+getHighlightColor(false)
 getDocumentSelection()

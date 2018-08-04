@@ -1,6 +1,3 @@
-const surlClass = 'surlHighlight'
-let highlightColor = 'yellow'
-
 /*
  * Unpacks varibales from the url
  */
@@ -22,20 +19,6 @@ var getData = (variable) => {
   return false;
 }
 
-var isDefined = (value) => {
-  if (typeof value !== 'undefined' || value === null || value === false) {
-    return true
-  }
-  return false
-}
-
-var insertHighlight = (range) => {
-  var newNode = document.createElement("div");
-  newNode.className = surlClass;
-  range.surroundContents(newNode);
-  return null
-}
-
 var absoluteOffset = function(element) {
   var top = 0, left = 0;
   do {
@@ -50,175 +33,83 @@ var absoluteOffset = function(element) {
   };
 };
 
-var setOffset = (node, index) => {
-    let i = 0
-    for (let child of node.childNodes) {
-      if (i === index) {
-        console.log('this child right here', child)
-        child = childNode
-        return child
-      } else {
-        console.log('nope', child)
-      }
-      i++
-    }
-    return null
-}
-
-var removeHighlight = (node) => {
-  while(node.firstChild) {
-    const parent = node.parentNode
-    parent.insertBefore(node.firstChild, node)
-    parent.removeChild(node)
-    parent.normalize()
-  }
-  return null
-}
-
-var getTextNodesBetween = (rootNode, startNode, endNode) => {
-  var pastStartNode = false, reachedEndNode = false, textNodes = [];
-
-  var getTextNodes = (node) => {
-      if (node == startNode) {
-          pastStartNode = true;
-      } else if (node == endNode) {
-          reachedEndNode = true;
-      } else if (node.nodeType == 3) {
-          if (pastStartNode && !reachedEndNode && !/^\s*$/.test(node.nodeValue)) {
-              textNodes.push(node);
-          }
-      } else {
-          for (var i = 0, len = node.childNodes.length; !reachedEndNode && i < len; ++i) {
-              getTextNodes(node.childNodes[i]);
-          }
-      }
-  }
-
-  getTextNodes(rootNode);
-  return textNodes;
-}
-
 /*
  * Gets Dom element, wraps it with css, and scrolls to it
  */
-
-
 var goToLocation = (attributes, smoothScroll) => {
   var scrollBehaviour = smoothScroll ? 'smooth': 'auto'
   var [at, ft, ai, fi, ao, fo, iai, ifi] = attributes;
-
-  // while (document.getElementsByClassName(surlClass).length > 0) {
-  //   const nodeList =  document.getElementsByClassName(surlClass)
-  //   removeHighlight(nodeList[0])
-  // }
   
-  if (isDefined(at) && isDefined(ft) && isDefined(ao) && isDefined(fo)) {
-    var anchorElements = document.querySelectorAll(at.toLowerCase());
-    var focusElements = document.querySelectorAll(ft.toLowerCase());
+  var anchorElements = document.querySelectorAll(at.toLowerCase());
+  var focusElements = document.querySelectorAll(ft.toLowerCase());
 
-    var range = document.createRange()
-    var offset = 0
-    
-    // highlightSelection(anchorElements[ai].childNodes[iai], focusElements[fi].childNodes[ifi])
+  highlightSelection(attributes)
+  let offset = absoluteOffset(anchorElements[ai])
 
-    if (anchorElements[ai].childNodes[iai] === focusElements[fi].childNodes[ifi]) {
-      range.setStart(anchorElements[ai].childNodes[iai], ao)
-      range.setEnd(focusElements[fi].childNodes[ifi], fo)
-      insertHighlight(range)
-    } else {
-      let textNodes = getTextNodesBetween(document.body, anchorElements[ai].childNodes[iai], focusElements[fi].childNodes[ifi]);
-
-      range.setStart(anchorElements[ai].childNodes[iai], ao)
-      range.setEndAfter(anchorElements[ai].childNodes[iai])
-      insertHighlight(range)
-      if (textNodes.length > 0) {
-        let count = 0
-        for (let node of textNodes) {
-          if (focusElements[fi].contains(node)) {
-            count++
-          }
-          range.selectNodeContents(node)
-          insertHighlight(range)
-        }
-    
-        // console.log(textNodes, focusElements[fi].childNodes, ifi, fo)
-        range.setStartBefore(focusElements[fi].childNodes[ifi + count])
-        range.setEnd(focusElements[fi].childNodes[ifi + count], fo)
-        insertHighlight(range)
-      }
-
-    }
-
-    setColor(highlightColor)
-    offset = absoluteOffset(anchorElements[ai])
-
-    // get scrollable element
-    var parent = anchorElements[ai].parentElement
-    while (parent !== null) {
-      var overflowY = window.getComputedStyle(parent, null).overflowY
-      if (overflowY === 'auto' || overflowY === 'scroll') {
-        parent.scroll({
-          top: offset.top - 200,
-          behavior: scrollBehaviour
-        })
-      } 
-      parent = parent.parentElement
+  // get scrollable element
+  var parent = anchorElements[ai].parentElement
+  while (parent !== null) {
+    var overflowY = window.getComputedStyle(parent, null).overflowY
+    if (overflowY === 'auto' || overflowY === 'scroll') {
+      parent.scroll({
+        top: offset.top - 200,
+        behavior: scrollBehaviour
+      })
     } 
-  }
-}
-
-function setColor() {
-  for (let selection of document.getElementsByClassName(surlClass)) {
-    selection.style.backgroundColor = highlightColor
-  }
+    parent = parent.parentElement
+  } 
 }
 
 ///////////////////////////////////////////////////////////////////////////
 //////////////////////////////  MAIN  /////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
+
+const mainGTL = () => {
+  try {
+    attributes = getData('surldata')
+  
+    if (attributes) {
+      getHighlightColor(true, attributes)
+    }
+  
+    setup = true
+  } catch (error) {
+    console.warn('Could not go to location: ', error)
+    setup = false
+  }
+  
+  if (setup) {
+    chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
+      var hMod = request.hMod || null;
+      var hColor = request.highlightColor || null;
+  
+      if (hColor) {
+        sendResponse(JSON.stringify({hColor: {success: true}}));
+  
+        getHighlightColor(false)
+      }
+  
+      if (hMod) {
+        index = index + hMod;
+        if (index < 0) {
+          index = attributes[0].length - 1
+        } else if (index >= attributes[0].length) {
+          index = 0
+        }
+        sendResponse(JSON.stringify({hMod: {index: index + 1, totalAnchors: attributes[0].length, success: true}}));
+        goToLocation(attributes.map(a => {return a[index]}), true)
+      }
+      else {
+        sendResponse(JSON.stringify({hMod: {index: null, totalAnchors: 0, success: false}}));
+      }  
+    })
+  }
+  return
+}
+
 let index = 0;
 let attributes = []
 let setup  = false
 
-try {
-  attributes = getData('surldata')
-  
-  chrome.storage.sync.get("highlightColor", function(color) {
-    highlightColor = color.highlightColor
-    goToLocation(attributes.map(a => {return a[index]}), false)
-  })
-  
-  setup = true
-} catch (error) {
-  console.warn('Could not go to location: ', error)
-  setup = false
-}
-
-if (setup) {
-  chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
-    var hMod = request.hMod || null;
-    var hColor = request.highlightColor || null;
-
-    if (hColor) {
-      sendResponse(JSON.stringify({hColor: {success: true}}));
-
-      highlightColor = hColor
-      setColor(hColor)
-    }
-
-    if (hMod) {
-      index = index + hMod;
-      if (index < 0) {
-        index = attributes[0].length - 1
-      } else if (index >= attributes[0].length) {
-        index = 0
-      }
-      sendResponse(JSON.stringify({hMod: {index: index + 1, totalAnchors: attributes[0].length, success: true}}));
-      goToLocation(attributes.map(a => {return a[index]}), true)
-    }
-    else {
-      sendResponse(JSON.stringify({hMod: {index: null, totalAnchors: 0, success: false}}));
-    }  
-  })
-}
+mainGTL ()
