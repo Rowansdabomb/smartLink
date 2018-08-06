@@ -1,21 +1,22 @@
 /*
  * Unpacks varibales from the url
  */
-var getQueryVariable = (variable) => {
+var getData = (variable) => {
   var query = window.location.search.substring(1);
   var vars = query.split("&");
   for (var i = 0; i < vars.length; i++) {
     var pair = vars[i].split("=");
-    if (pair[0] == variable) { return pair[1]; }
+    if (pair[0] == variable) { 
+      return pair[1].split('.').map((element, index) => {
+        if (index > 1) {
+          return element.split('_').map((element) => {return Number(element)})
+        } else{
+          return element.split('_')
+        }
+      }); 
+    }
   }
   return false;
-}
-
-var isDefined = (value) => {
-  if (typeof value !== 'undefined') {
-    return true
-  }
-  return false
 }
 
 var absoluteOffset = function(element) {
@@ -32,118 +33,83 @@ var absoluteOffset = function(element) {
   };
 };
 
-document.commonParent = function(a, b) {
-  if (a === b) {
-    return a.parentNode
-  } else {
-    var pa = [], L;
-    while (a) {
-      pa[pa.length] = a;
-      a = a.parentNode;
-    }
-    L = pa.length;
-    while (b) {  
-      for(var i = 0; i < L; i++){
-        if (pa[i] == b) return b;
-      }
-      b = b.parentNode;
-    }
-  }
-}
-
-var insertHighlight = (start, startOffset, end, endOffset, nodeList) => {
-  for (let i = start; i <= end; i++) {
-    var range = document.createRange();
-    if (i === start) {
-      range.setStart(nodeList[i].firstChild, startOffset)
-      if (i === end) {
-        range.setEnd(nodeList[i].firstChild, nodeList[i].firstChild.length)
-      } else {
-        range.setEnd(nodeList[i].firstChild, nodeList[i].firstChild.length)
-      }
-    } else if (i === end) {
-      range.setStart(nodeList[i].firstChild, 0)
-      range.setEnd(nodeList[i].firstChild, endOffset)
-    } else {
-      range.setStart(nodeList[i].firstChild, 0)
-      range.setEnd(nodeList[i].firstChild, nodeList[i].firstChild.length)
-    }
-
-    var newNode = document.createElement("div");
-    newNode.className = 'surlHighlight';
-
-    range.surroundContents(newNode);
-  }
-}
-
 /*
  * Gets Dom element, wraps it with css, and scrolls to it
  */
+var goToLocation = (attributes, smoothScroll) => {
+  var scrollBehaviour = smoothScroll ? 'smooth': 'auto'
+  var [at, ft, ai, fi, ao, fo, iai, ifi] = attributes;
+  
+  var anchorElements = document.querySelectorAll(at.toLowerCase());
+  var focusElements = document.querySelectorAll(ft.toLowerCase());
 
-var goToLocation = () => {
-  var at = getQueryVariable('surlat')
-  var ft = getQueryVariable('surlft')
-  var ai = getQueryVariable('surlai')
-  var fi = getQueryVariable('surlfi')
-  var ao = getQueryVariable('surlao')
-  var fo = getQueryVariable('surlfo')
+  highlightSelection(attributes)
+  let offset = absoluteOffset(anchorElements[ai])
 
-  if (isDefined(at) && isDefined(ft) && isDefined(ai) && isDefined(fi) && isDefined(ao) && isDefined(fo)) {
-    var anchorNodes = document.querySelectorAll(at.toLowerCase());
-    var focusNodes = document.querySelectorAll(ft.toLowerCase());
-
-    var commonParent = document.commonParent(anchorNodes[ai], focusNodes[fi])
-    var nodeList = commonParent.children
-    var anchorIndex = 0;
-    var focusIndex = 0;
-    for (let i = 0; i < nodeList.length; i++) {
-
-      if (anchorNodes[ai] === nodeList[i]) {
-        anchorIndex = i
-      }
-      if (focusNodes[fi] === nodeList[i]) {
-        focusIndex = i
-      }
-    }
-
-    var offset = 0
-    if (focusIndex > anchorIndex) {
-      offset = absoluteOffset(anchorNodes[ai])
-      insertHighlight(anchorIndex, ao, focusIndex, fo, nodeList)
-    } else if (focusIndex < anchorIndex){
-      offset = absoluteOffset(focusNodes[fi]),
-      insertHighlight(focusIndex, fo, anchorIndex, ao, nodeList)
-    } else if (fo > ao) {
-      offset = absoluteOffset(anchorNodes[ai])
-      insertHighlight(anchorIndex, ao, focusIndex, fo, nodeList)
-    } else {
-      offset = absoluteOffset(anchorNodes[ai])
-      insertHighlight(focusIndex, fo, anchorIndex, ao, nodeList)
-    }
-
-
-    // get scrollable element
-    var parent = anchorNodes[ai].parentElement
-    var foundScroll = false
-    while (parent !== null) {
-      var overflowY = window.getComputedStyle(parent, null).overflowY
-      if (overflowY === 'auto' || overflowY === 'scroll') {
-        parent.scroll({
-          top: offset.top - 100,
-          behavior: "auto"
-        })
-        foundScroll = true
-        break
-      }
-      parent = parent.parentElement
-    }
-    if (!foundScroll) {
-      window.scroll({
-        top: offset.top - 100,
-        behavior: "auto"
-      });
-    }
-  }
+  // get scrollable element
+  var parent = anchorElements[ai].parentElement
+  while (parent !== null) {
+    var overflowY = window.getComputedStyle(parent, null).overflowY
+    if (overflowY === 'auto' || overflowY === 'scroll') {
+      parent.scroll({
+        top: offset.top - 200,
+        behavior: scrollBehaviour
+      })
+    } 
+    parent = parent.parentElement
+  } 
 }
 
-goToLocation()
+///////////////////////////////////////////////////////////////////////////
+//////////////////////////////  MAIN  /////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
+
+
+const mainGTL = () => {
+  try {
+    attributes = getData('surldata')
+  
+    if (attributes) {
+      getHighlightColor(true, attributes)
+    }
+  
+    setup = true
+  } catch (error) {
+    console.warn('Could not go to location: ', error)
+    setup = false
+  }
+  
+  if (setup) {
+    chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
+      var hMod = request.hMod || null;
+      var hColor = request.highlightColor || null;
+  
+      if (hColor) {
+        sendResponse(JSON.stringify({hColor: {success: true}}));
+  
+        getHighlightColor(false)
+      }
+  
+      if (hMod) {
+        index = index + hMod;
+        if (index < 0) {
+          index = attributes[0].length - 1
+        } else if (index >= attributes[0].length) {
+          index = 0
+        }
+        sendResponse(JSON.stringify({hMod: {index: index + 1, totalAnchors: attributes[0].length, success: true}}));
+        goToLocation(attributes.map(a => {return a[index]}), true)
+      }
+      else {
+        sendResponse(JSON.stringify({hMod: {index: null, totalAnchors: 0, success: false}}));
+      }  
+    })
+  }
+  return
+}
+
+let index = 0;
+let attributes = []
+let setup  = false
+
+mainGTL ()

@@ -1,74 +1,160 @@
+var strSplice = (str, index, add) => {
+  if (index < 0) {
+    index = str.length + index;
+    if (index < 0) {
+      index = 0;
+    }
+  }
+
+  return str.slice(0, index) + add + str.slice(index);
+}
+
+var createSurl = (attributes) => {
+  var copyUrl = document.getElementById("surlCopy");
+  try {
+    var url = copyUrl.value.split('?')
+    url = '?' + url[1]
+  } catch {
+    url = window.location.search
+    copyUrl = document.createElement("textarea");
+    copyUrl.classList.add('copysurl')
+    copyUrl.id = 'surlCopy';
+    document.body.appendChild(copyUrl);
+  }
+  url = url.split('&')
+  if (url.length === 1 && url[0] === '') {
+    url = []
+  }
+  let index = 0
+  let modified = false
+  for (let chunk of url) {
+    const start = chunk.search('surldata=')
+    if (start >= 0) {
+      if (chunk.includes('?')) {
+        chunk = chunk.slice('?surldata='.length).split('.')
+      } else {
+        chunk = chunk.slice('surldata='.length).split('.')
+      }
+      
+      let count = 0;
+      for (let i = 0; i < chunk.length; i++) {
+        chunk[i] += '_' + String(attributes[count])
+        count++
+      }
+      chunk = chunk.join('.')
+      chunk = '&surldata='.concat(chunk)
+      modified = true
+    } 
+    if (index === 0) {
+      chunk = chunk.replace('&', '?')
+    }
+    url[index] = chunk
+    index++
+  }
+  if (!modified) {
+    if (url.length > 0) {
+      url.push('&surldata='.concat(attributes.join('.')))
+    } else {
+      url.push('?surldata='.concat(attributes.join('.')))
+    }
+  }
+  
+  url.unshift(window.location.origin + window.location.pathname)
+  url = url.join('')
+
+  copyUrl.value = url;
+  console.log(copyUrl.value)
+  copyUrl.select();
+  document.execCommand('copy');
+}
+
+getInnerIndex = (nodeList, target) => {
+  let index = 0
+  for (let node of nodeList) {
+    if (node === target) {
+      break
+    }
+    index++
+  }
+
+  return index
+}
+
 var getDocumentSelection = () => {
   var selection = window.getSelection()
   var setup = false
   try {
-    // var uri = selection.anchorNode.baseURI
-    var uri = window.location.href
     var anchorElement = selection.anchorNode.parentElement
     var anchorTag = anchorElement.tagName
-
+    
     var focusElement = selection.focusNode.parentElement
     var focusTag = focusElement.tagName
-
+    
     var anchorOffset = selection.anchorOffset
     var focusOffset = selection.focusOffset
 
-    var focusNodes = document.querySelectorAll(focusTag);
-    var anchorNodes = document.querySelectorAll(anchorTag);
+    var anchorElements = document.querySelectorAll(anchorTag);
+    var focusElements = document.querySelectorAll(focusTag);
+
+    var innerAnchorIndex = getInnerIndex(anchorElement.childNodes, selection.anchorNode)
+    var innerFocusIndex = getInnerIndex(focusElement.childNodes, selection.focusNode)
+
+    const mask = selection.anchorNode.compareDocumentPosition(selection.focusNode)
+    var anchorFirst = true;
+    switch (mask) {
+      case mask & 0:
+        if (anchorOffset > focusOffset)
+          anchorFirst = false
+        break
+      case mask & 1:
+        console.error('the two nodes do not belong to the same document')
+        break
+      case mask & 2:
+        anchorFirst = false
+        break
+      case mask & 4:
+        break
+      case mask & 8:
+        anchorFirst = false
+        break
+      default:
+    }
+
     setup = true
-  }
-  catch {
-    console.warn('no selection made')
-    setup
+  } catch (error) {
+    console.warn('Document selection could not be completed: ', error)
+    setup = false
   }
 
   if (setup) {
-    for (var anchorIndex = 0; anchorIndex < anchorNodes.length; anchorIndex++) {
-      if (anchorNodes[anchorIndex] === anchorElement) {
+    for (var anchorElementIndex = 0; anchorElementIndex < anchorElements.length; anchorElementIndex++) {
+      if (anchorElements[anchorElementIndex] === anchorElement) {
         break
       }
     }
 
-    for (var focusIndex = 0; focusIndex < focusNodes.length; focusIndex++) {
-      if (focusNodes[focusIndex] === focusElement) {
+    for (var focusElementIndex = 0; focusElementIndex < focusElements.length; focusElementIndex++) {
+      if (focusElements[focusElementIndex] === focusElement) {
         break
       }
     }
-  
-    var start = uri.search('surlat=')
-    var end = uri.search('&surlfo=')
-    if (end !== -1) {
-      end += 1
-      for (end; end < uri.length; end++) {
-        if (uri[end] === '&') {
-          break
-        }
-      }
-    }
-    if (start !== -1) {
-      uri = uri.replace(uri.slice(start, end), '')
-    }
-  
-    var surl = uri
-    if (surl.lastIndexOf('?') !== surl.length - 1 && surl.lastIndexOf('?') !== -1) {
-      surl += '&'
-    } else if (surl.lastIndexOf('?') === -1) {
-      surl += '?'
+
+    if (anchorFirst) {
+      attributes = [anchorTag, focusTag, anchorElementIndex, focusElementIndex, anchorOffset, focusOffset, innerAnchorIndex, innerFocusIndex]
+    } else {
+      attributes = [focusTag, anchorTag, focusElementIndex, anchorElementIndex, focusOffset, anchorOffset, innerFocusIndex, innerAnchorIndex]
     }
 
-    surl += 'surlat=' + String(anchorTag) + '&surlft=' + String(focusTag) + '&surlai=' + String(anchorIndex) + '&surlfi=' + String(focusIndex) + '&surlao=' + anchorOffset + '&surlfo=' + focusOffset 
-  
-    // copy surl to clipboard
-    var copyUrl = document.createElement("textarea");
-    copyUrl.value = surl;
-    document.body.appendChild(copyUrl);
-    copyUrl.select();
-    document.execCommand('copy');
-    document.body.removeChild(copyUrl);
+    if (highlightSelection(attributes, true)) {
+      createSurl(attributes)
+    }
+
+    // if (document.getElementById("surl-d-container") === null) {
+    //   createDraggable()
+    // }
   }
-
   return 
 }
 
+getHighlightColor(false)
 getDocumentSelection()
-
