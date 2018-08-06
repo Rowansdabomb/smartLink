@@ -19,3 +19,23 @@
     position: fixed;
     width: 100%;
 }
+
+#surl-d-container {
+    position: absolute;
+    width: 220px;
+    height: 100px;
+    background: red;
+    z-index: 1000;
+    cursor: pointer;
+}
+
+#surl-d-title {
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 5px 10px;
+    background-color: blueviolet;
+    color: white;
+    cursor: move;
+    box-sizing: border-box;
+}

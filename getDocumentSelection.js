@@ -148,6 +148,10 @@ var getDocumentSelection = () => {
     if (highlightSelection(attributes, true)) {
       createSurl(attributes)
     }
+
+    // if (document.getElementById("surl-d-container") === null) {
+    //   createDraggable()
+    // }
   }
   return 
 }
