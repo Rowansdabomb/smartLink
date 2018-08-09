@@ -1,3 +1,5 @@
+var initialize = true
+
 var strSplice = (str, index, add) => {
   if (index < 0) {
     index = str.length + index;
@@ -5,26 +7,28 @@ var strSplice = (str, index, add) => {
       index = 0;
     }
   }
-
   return str.slice(0, index) + add + str.slice(index);
 }
 
+var arrayRemove = (array, value) => {
+  return array.filter(function(element){
+    return element != value;
+  });
+}
+
 var createSurl = (attributes) => {
-  var copyUrl = document.getElementById("surlCopy");
+  var copyUrl = document.getElementById("surl-copy");
   try {
     var url = copyUrl.value.split('?')
     url = '?' + url[1]
   } catch {
     url = window.location.search
     copyUrl = document.createElement("textarea");
-    copyUrl.classList.add('copysurl')
-    copyUrl.id = 'surlCopy';
+    copyUrl.classList.add('copy-surl')
+    copyUrl.id = 'surl-copy';
     document.body.appendChild(copyUrl);
   }
-  url = url.split('&')
-  if (url.length === 1 && url[0] === '') {
-    url = []
-  }
+  url = arrayRemove(url.split('&'), '')
   let index = 0
   let modified = false
   for (let chunk of url) {
@@ -35,16 +39,18 @@ var createSurl = (attributes) => {
       } else {
         chunk = chunk.slice('surldata='.length).split('.')
       }
-      
       let count = 0;
       for (let i = 0; i < chunk.length; i++) {
         chunk[i] += '_' + String(attributes[count])
         count++
       }
+      
       chunk = chunk.join('.')
       chunk = '&surldata='.concat(chunk)
       modified = true
-    } 
+    } else if (index !== 0) {
+      chunk = '&'.concat(chunk)
+    }
     if (index === 0) {
       chunk = chunk.replace('&', '?')
     }
@@ -58,7 +64,6 @@ var createSurl = (attributes) => {
       url.push('?surldata='.concat(attributes.join('.')))
     }
   }
-  
   url.unshift(window.location.origin + window.location.pathname)
   url = url.join('')
 
@@ -66,6 +71,7 @@ var createSurl = (attributes) => {
   console.log(copyUrl.value)
   copyUrl.select();
   document.execCommand('copy');
+  totalSelections++
 }
 
 getInnerIndex = (nodeList, target) => {
@@ -122,7 +128,7 @@ var getDocumentSelection = () => {
 
     setup = true
   } catch (error) {
-    console.warn('Document selection could not be completed: ', error)
+    console.warn(error)
     setup = false
   }
 
@@ -149,12 +155,17 @@ var getDocumentSelection = () => {
       createSurl(attributes)
     }
 
-    // if (document.getElementById("surl-d-container") === null) {
-    //   createDraggable()
-    // }
+    if (document.getElementById("surl-d-container") === null) {
+      anchorFirst ? createDraggable(anchorElement.innerText.slice(0, 10)): createDraggable(focusElement.innerText.slice(0, 10))
+    } else {
+      anchorFirst ? updateDraggable(anchorElement.innerText.slice(0, 10)): updateDraggable(focusElement.innerText.slice(0, 10))
+    }
   }
   return 
 }
 
-getHighlightColor(false)
+if (highlightColor === null) {
+  getHighlightColor(false)
+}
+
 getDocumentSelection()

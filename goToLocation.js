@@ -3,15 +3,27 @@
  */
 var getData = (variable) => {
   var query = window.location.search.substring(1);
+  if (!query || query.search('surldata') < 0) {
+    let url = document.getElementById('surl-copy').value.split('?')
+    url = arrayRemove(url, '')
+    if (url.length < 2) {
+      return false
+    }
+    query = url[1]
+  }
   var vars = query.split("&");
   for (var i = 0; i < vars.length; i++) {
     var pair = vars[i].split("=");
     if (pair[0] == variable) { 
       return pair[1].split('.').map((element, index) => {
         if (index > 1) {
-          return element.split('_').map((element) => {return Number(element)})
-        } else{
-          return element.split('_')
+          const result = element.split('_').map((element) => {return Number(element)})
+          totalSelections = result.length - 1
+          return result
+        } else {
+          result = element.split('_')
+          totalSelections = result.length - 1
+          return result
         }
       }); 
     }
@@ -36,15 +48,17 @@ var absoluteOffset = function(element) {
 /*
  * Gets Dom element, wraps it with css, and scrolls to it
  */
-var goToLocation = (attributes, smoothScroll) => {
+var goToLocation = (attributes, smoothScroll, index) => {
   var scrollBehaviour = smoothScroll ? 'smooth': 'auto'
   var [at, ft, ai, fi, ao, fo, iai, ifi] = attributes;
   
   var anchorElements = document.querySelectorAll(at.toLowerCase());
   var focusElements = document.querySelectorAll(ft.toLowerCase());
 
-  highlightSelection(attributes)
+  highlightSelection(attributes, false, index)
   let offset = absoluteOffset(anchorElements[ai])
+
+  console.log(offset)
 
   // get scrollable element
   var parent = anchorElements[ai].parentElement
@@ -65,11 +79,11 @@ var goToLocation = (attributes, smoothScroll) => {
 ///////////////////////////////////////////////////////////////////////////
 
 
-const mainGTL = () => {
+const mainGTL = (index) => {
   try {
     attributes = getData('surldata')
   
-    if (attributes) {
+    if (attributes && highlightColor === null) {
       getHighlightColor(true, attributes)
     }
   
@@ -78,10 +92,13 @@ const mainGTL = () => {
     console.warn('Could not go to location: ', error)
     setup = false
   }
-  
   if (setup) {
+    if (attributes) {
+      goToLocation(attributes.map(a => {return a[index]}), true, index )
+    }
+
     chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
-      var hMod = request.hMod || null;
+      // var hMod = request.hMod || null;
       var hColor = request.highlightColor || null;
   
       if (hColor) {
@@ -89,20 +106,20 @@ const mainGTL = () => {
   
         getHighlightColor(false)
       }
-  
-      if (hMod) {
-        index = index + hMod;
-        if (index < 0) {
-          index = attributes[0].length - 1
-        } else if (index >= attributes[0].length) {
-          index = 0
-        }
-        sendResponse(JSON.stringify({hMod: {index: index + 1, totalAnchors: attributes[0].length, success: true}}));
-        goToLocation(attributes.map(a => {return a[index]}), true)
-      }
-      else {
-        sendResponse(JSON.stringify({hMod: {index: null, totalAnchors: 0, success: false}}));
-      }  
+      
+      // if (hMod) {
+      //   index = index + hMod;
+      //   if (index < 0) {
+      //     index = attributes[0].length - 1
+      //   } else if (index >= attributes[0].length) {
+      //     index = 0
+      //   }
+      //   sendResponse(JSON.stringify({hMod: {index: index + 1, totalAnchors: attributes[0].length, success: true}}));
+      //   goToLocation(attributes.map(a => {return a[index]}), true, index )
+      // }
+      // else {
+      //   sendResponse(JSON.stringify({hMod: {index: null, totalAnchors: 0, success: false}}));
+      // }  
     })
   }
   return

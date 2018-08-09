@@ -1,13 +1,10 @@
 function respond(response) {
   response = JSON.parse(response)
-  console.log(response)
   try {
     if (response.hMod) {
       var {index, totalAnchors, success} = response.hMod
 
       anchorTracker.innerText = String(index) + '/' + String(totalAnchors)
-    } else if (response.hColor) {
-      console.log(response.hColor.success)
     } else {
       // this should be initialized on tab load
       
@@ -21,13 +18,8 @@ function respond(response) {
 
 function radioValues(value) {
   var radios = document.querySelectorAll('input.colorChoice')
-  if (value) {
-    console.log(value)
-    
-  }
   if (radios) {
     for (let i = 0; i < radios.length; i++) {
-      console.log(radios[i].value)
       if (value === radios[i].value) {
         radios[i].checked = true
       }
@@ -48,7 +40,6 @@ function radioValues(value) {
 
 document.addEventListener('DOMContentLoaded', function() {
   var anchorTracker = document.getElementById('anchorTracker')
-  
 
   chrome.storage.sync.get("highlightColor", function(color) {
     highlightColor = color.highlightColor
