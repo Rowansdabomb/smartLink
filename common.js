@@ -69,6 +69,11 @@ var insertHighlight = (range, index) => {
     console.error(error)
     return null
   }
+  if (document.getElementById("surl-d-container") === null) {
+    createDraggable()
+  } else {
+    updateDraggable(index)
+  }
   return null
 }
 
@@ -171,7 +176,8 @@ var highlightSelection = (attributes, select, index) => {
   return true
 }
 
-const createDraggable = (selection) => {
+const createDraggable = () => {
+  console.log('create')
   chrome.storage.sync.get(['curlDragTop','curlDragLeft'], function(data) {
     let container = document.createElement('div')
     container.id = 'surl-d-container'
@@ -182,11 +188,18 @@ const createDraggable = (selection) => {
       container.style.top = data.curlDragTop ? data.curlDragTop: 0
       container.style.left = data.curlDragLeft? data.curlDragLeft: 0
     }
-  
-    let title = document.createElement('span')
+    let header = document.createElement('div')
+    header.id = 'surl-d-header'
+    container.appendChild(header)
+    let title = document.createElement('div')
     title.id = 'surl-d-title'
     title.innerText = 'Curl Selections'
-    container.appendChild(title)
+    header.appendChild(title)
+    let close = document.createElement('div')
+    close.id = 'surl-d-close'
+    var imgURL = chrome.extension.getURL("images/Close-icon.png")
+    close.style.backgroundImage = imgURL
+    header.appendChild(close)
   
     let list = document.createElement('ol')
     list.id = 'surl-d-ol'
@@ -195,15 +208,26 @@ const createDraggable = (selection) => {
     document.body.appendChild(container)
   
     dragElement(document.getElementById("surl-d-container"));
-    updateDraggable(selection)
+    updateDraggable(0)
   })
 }
 
-const updateDraggable = (selection) => {
+const updateDraggable = (index) => {
+  let selection = document.getElementsByClassName(surlClass+'-' + String(index))
+  console.log(selection)
+  selection = 'fill'
   let list = document.getElementById('surl-d-ol')
   let listItem = document.createElement('li')
   listItem.classList.add('surl-d-li')
-  listItem.innerText = selection
+
+  let listItemText = document.createElement('span')
+  listItemText.innerText = selection
+  listItem.appendChild(listItemText)
+
+  let deleteIcon = document.createElement('div')
+  deleteIcon.className = 'surl-d-delete-icon'
+  listItem.appendChild(deleteIcon)
+
   list.appendChild(listItem)
   return null
 }
@@ -256,45 +280,41 @@ function dragElement(element) {
 }
 
 document.addEventListener('click', (event) => {
-	// If the clicked element doesn't have the right selector, bail
-  if (!event.target.matches('#surl-d-ol>li')) return
+  const query1 = '.surl-d-li>span'
+  const query2 = '.surl-d-delete-icon'
+	// // If the clicked element doesn't have the right selector, bail
+  // if (!event.target.matches(query1) || !event.target.matches(query2)) return
 
-  // Don't follow the link
-	event.preventDefault()
-
-	// Log the clicked element in the console
+  // Log the clicked element in the console
   console.log(event.target)
-  let list = document.querySelectorAll('#surl-d-ol>li')
-  for (let index = 0; index < list.length; index++) {
-    if (list[index] === event.target) {
-      console.log(index)
-      mainGTL(index)
+  if (event.target.matches(query1)) {
+    // Don't follow the link
+    event.preventDefault()
+    let list = document.querySelectorAll(query1)
+ 
+    for (let index = 0; index < list.length; index++) {
+      if (list[index] === event.target) {
+        console.log(index)
+        mainGTL(index)
+      }
     }
+  } else if (event.target.matches(query2)) {
+    // Don't follow the link
+    event.preventDefault()
+    let list = document.querySelectorAll(query2)
+
+    for (let index = 0; index < list.length; index++) {
+      if (list[index] === event.target) {
+        const remove = 'surl-highlight-'.concat(String(index))
+        console.log(remove)
+        for (let i = document.getElementsByClassName(remove).length - 1; i > -1; i--) {
+          removeHighlight(document.getElementsByClassName(remove)[i])
+        }
+        console.log(event.target.parentElement)
+        document.getElementById('surl-d-ol').removeChild(event.target.parentElement)
+      }
+    }
+  } else {
+    return
   }
-  
-  // if (targetSelection.getElementsByClassName('surl-delete-button').length < 1) {
-  //   let deleteButton = document.createElement('span')
-  //   deleteButton.classList.add('surl-delete-button')
-  //   deleteButton.innerText = 'Remove'
-  //   deleteButton.offsetTop = targetSelection.offsetTop
-  //   deleteButton.offsetLeft = targetSelection.offsetLeft
-  //   deleteButton.addEventListener('click', (event) => {
-  //     targetSelection.removeChild(deleteButton)
-  //     let targetClass = 'surl-highlight-0'
-  //     targetSelection.classList.forEach((nodeClass, index) => {
-  //       console.log(nodeClass)
-  //       const minLength = 'surl-highlight-'.length
-  //       if (nodeClass.length > minLength) {
-  //         targetClass = nodeClass
-  //       }
-  //     })
-  //     console.log(document.getElementsByClassName(targetClass))
-  //     for (let i = document.getElementsByClassName(targetClass).length - 1; i > 0; i--) {
-  //       removeHighlight(document.getElementsByClassName(targetClass)[i])
-  //     }
-  //   })
-  //   event.target.appendChild(deleteButton)
-  // }
-
-
 }, false);

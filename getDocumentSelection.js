@@ -155,11 +155,11 @@ var getDocumentSelection = () => {
       createSurl(attributes)
     }
 
-    if (document.getElementById("surl-d-container") === null) {
-      anchorFirst ? createDraggable(anchorElement.innerText.slice(0, 10)): createDraggable(focusElement.innerText.slice(0, 10))
-    } else {
-      anchorFirst ? updateDraggable(anchorElement.innerText.slice(0, 10)): updateDraggable(focusElement.innerText.slice(0, 10))
-    }
+    // console.log(document.getElementById("surl-d-container"))
+    // if (document.getElementById("surl-d-container") === null) {
+    //   createDraggable()
+    // } 
+
   }
   return 
 }
