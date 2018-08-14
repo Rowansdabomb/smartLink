@@ -1,8 +1,3 @@
-const surlClass = 'surl-highlight'
-let highlightColor = null
-var totalSelections = 0
-var globalIndex = 0
-
 var isDefined = (value) => {
   if (typeof value !== 'undefined' || value === null || value === false) {
     return true
@@ -70,11 +65,11 @@ var insertHighlight = (range, index) => {
     return null
   }
   if (document.getElementById("surl-d-container") === null) {
-    createDraggable()
+    dragElement.create()
   } else {
-    updateDraggable(index)
+    dragElement.append(index)
   }
-  return null
+  return
 }
 
 var removeHighlight = (node) => {
@@ -111,7 +106,7 @@ var highlightSelection = (attributes, select, index) => {
   
   var range = document.createRange();
   if (select) {
-    index = totalSelections
+    index = state.attributes[0].length - 1
   }
   if (!checkAlreadyInserted(anchorElements[ai].childNodes)) {
     if (anchorElements[ai].childNodes[iai] === focusElements[fi].childNodes[ifi]) {
@@ -121,7 +116,7 @@ var highlightSelection = (attributes, select, index) => {
       } catch (error) {
         alert('Error! Cannot highlight Selection')
         console.error(error)
-        return null
+        return
       }
       insertHighlight(range, index)
     } else {
@@ -132,7 +127,7 @@ var highlightSelection = (attributes, select, index) => {
       } catch (error) {
         alert('Error! Cannot highlight Selection')
         console.error(error)
-        return null
+        return
       }
       insertHighlight(range, index)
       if (textNodes.length > 0) {
@@ -151,7 +146,7 @@ var highlightSelection = (attributes, select, index) => {
           alert('Error! Cannot highlight Selection')
           console.error(error)
           console.log(focusElements[fi].childNodes[ifi + count])
-          return null
+          return
         }
         insertHighlight(range, index)
       } else {
@@ -161,7 +156,7 @@ var highlightSelection = (attributes, select, index) => {
         } catch (error) {
           alert('Error! Cannot highlight Selection')
           console.error(error)
-          return null
+          return
         }
         insertHighlight(range, index)
       }
@@ -176,145 +171,3 @@ var highlightSelection = (attributes, select, index) => {
   return true
 }
 
-const createDraggable = () => {
-  console.log('create')
-  chrome.storage.sync.get(['curlDragTop','curlDragLeft'], function(data) {
-    let container = document.createElement('div')
-    container.id = 'surl-d-container'
-    container.style.top = 0
-    container.style.left = 0
-
-    if (data) {
-      container.style.top = data.curlDragTop ? data.curlDragTop: 0
-      container.style.left = data.curlDragLeft? data.curlDragLeft: 0
-    }
-    let header = document.createElement('div')
-    header.id = 'surl-d-header'
-    container.appendChild(header)
-    let title = document.createElement('div')
-    title.id = 'surl-d-title'
-    title.innerText = 'Curl Selections'
-    header.appendChild(title)
-    let close = document.createElement('div')
-    close.id = 'surl-d-close'
-    var imgURL = chrome.extension.getURL("images/Close-icon.png")
-    close.style.backgroundImage = imgURL
-    header.appendChild(close)
-  
-    let list = document.createElement('ol')
-    list.id = 'surl-d-ol'
-    container.appendChild(list)
-  
-    document.body.appendChild(container)
-  
-    dragElement(document.getElementById("surl-d-container"));
-    updateDraggable(0)
-  })
-}
-
-const updateDraggable = (index) => {
-  let selection = document.getElementsByClassName(surlClass+'-' + String(index))
-  console.log(selection)
-  selection = 'fill'
-  let list = document.getElementById('surl-d-ol')
-  let listItem = document.createElement('li')
-  listItem.classList.add('surl-d-li')
-
-  let listItemText = document.createElement('span')
-  listItemText.innerText = selection
-  listItem.appendChild(listItemText)
-
-  let deleteIcon = document.createElement('div')
-  deleteIcon.className = 'surl-d-delete-icon'
-  listItem.appendChild(deleteIcon)
-
-  list.appendChild(listItem)
-  return null
-}
-
-function dragElement(element) {
-  var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-  if (document.getElementById(element.id + "header")) {
-    /* if present, the header is where you move the DIV from:*/
-    document.getElementById(element.id + "header").onmousedown = dragMouseDown;
-  } else {
-    /* otherwise, move the DIV from anywhere inside the DIV:*/
-    element.onmousedown = dragMouseDown;
-  }
-
-  function dragMouseDown(e) {
-    e = e || window.event;
-    e.preventDefault();
-    // get the mouse cursor position at startup:
-    pos3 = e.clientX;
-    pos4 = e.clientY;
-    document.onmouseup = closeDragElement;
-    // call a function whenever the cursor moves:
-    document.onmousemove = elementDrag;
-  }
-
-  function elementDrag(e) {
-    e = e || window.event;
-    e.preventDefault();
-    // calculate the new cursor position:
-    pos1 = pos3 - e.clientX;
-    pos2 = pos4 - e.clientY;
-    pos3 = e.clientX;
-    pos4 = e.clientY;
-    // set the element's new position:
-    element.style.top = (element.offsetTop - pos2) + "px";
-    element.style.left = (element.offsetLeft - pos1) + "px";
-  }
-
-  function closeDragElement() {
-    /* stop moving when mouse button is released:*/
-    document.onmouseup = null;
-    document.onmousemove = null;
-
-    const element = document.getElementById('surl-d-container')
-    chrome.storage.sync.set({
-      'curlDragTop': element.style.top,
-      'curlDragLeft': element.style.left,
-    })
-  }
-}
-
-document.addEventListener('click', (event) => {
-  const query1 = '.surl-d-li>span'
-  const query2 = '.surl-d-delete-icon'
-	// // If the clicked element doesn't have the right selector, bail
-  // if (!event.target.matches(query1) || !event.target.matches(query2)) return
-
-  // Log the clicked element in the console
-  console.log(event.target)
-  if (event.target.matches(query1)) {
-    // Don't follow the link
-    event.preventDefault()
-    let list = document.querySelectorAll(query1)
- 
-    for (let index = 0; index < list.length; index++) {
-      if (list[index] === event.target) {
-        console.log(index)
-        mainGTL(index)
-      }
-    }
-  } else if (event.target.matches(query2)) {
-    // Don't follow the link
-    event.preventDefault()
-    let list = document.querySelectorAll(query2)
-
-    for (let index = 0; index < list.length; index++) {
-      if (list[index] === event.target) {
-        const remove = 'surl-highlight-'.concat(String(index))
-        console.log(remove)
-        for (let i = document.getElementsByClassName(remove).length - 1; i > -1; i--) {
-          removeHighlight(document.getElementsByClassName(remove)[i])
-        }
-        console.log(event.target.parentElement)
-        document.getElementById('surl-d-ol').removeChild(event.target.parentElement)
-      }
-    }
-  } else {
-    return
-  }
-}, false);

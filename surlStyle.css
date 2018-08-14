@@ -39,10 +39,12 @@
 }
 
 #surl-copy {
-    z-index: 10;
-    top: 0px;
+    z-index: -1000;
+    height: 0;
+    width: 0;
+    visibility: hidden;
+    top: -100px;
     position: fixed;
-    width: 100%;
 }
 
 #surl-d-container {
@@ -89,8 +91,9 @@
 }
 
 #surl-d-ol {
-    padding-left: 10px;
-    padding-right: 10px;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
 }
 
 .surl-d-delete-icon {
@@ -105,7 +108,7 @@
     opacity: .6;
 }
 
-li.surl-d-li {
+.surl-d-li {
     display: flex;
     align-items: center;
     justify-content: space-between;

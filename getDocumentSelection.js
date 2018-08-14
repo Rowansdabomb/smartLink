@@ -1,5 +1,3 @@
-var initialize = true
-
 var strSplice = (str, index, add) => {
   if (index < 0) {
     index = str.length + index;
@@ -16,62 +14,26 @@ var arrayRemove = (array, value) => {
   });
 }
 
-var createSurl = (attributes) => {
-  var copyUrl = document.getElementById("surl-copy");
-  try {
-    var url = copyUrl.value.split('?')
-    url = '?' + url[1]
-  } catch {
-    url = window.location.search
+var createSurl = () => {
+  if (document.getElementById('surl-copy') === null) {
     copyUrl = document.createElement("textarea");
     copyUrl.classList.add('copy-surl')
     copyUrl.id = 'surl-copy';
     document.body.appendChild(copyUrl);
   }
-  url = arrayRemove(url.split('&'), '')
-  let index = 0
-  let modified = false
-  for (let chunk of url) {
-    const start = chunk.search('surldata=')
-    if (start >= 0) {
-      if (chunk.includes('?')) {
-        chunk = chunk.slice('?surldata='.length).split('.')
-      } else {
-        chunk = chunk.slice('surldata='.length).split('.')
-      }
-      let count = 0;
-      for (let i = 0; i < chunk.length; i++) {
-        chunk[i] += '_' + String(attributes[count])
-        count++
-      }
-      
-      chunk = chunk.join('.')
-      chunk = '&surldata='.concat(chunk)
-      modified = true
-    } else if (index !== 0) {
-      chunk = '&'.concat(chunk)
-    }
-    if (index === 0) {
-      chunk = chunk.replace('&', '?')
-    }
-    url[index] = chunk
-    index++
-  }
-  if (!modified) {
-    if (url.length > 0) {
-      url.push('&surldata='.concat(attributes.join('.')))
-    } else {
-      url.push('?surldata='.concat(attributes.join('.')))
-    }
-  }
-  url.unshift(window.location.origin + window.location.pathname)
-  url = url.join('')
 
-  copyUrl.value = url;
+  let query = Object.keys(state.attributes).reduce((carry, key, index) => {
+    return carry += '.'.concat(state.attributes[index].join('_'))
+  }, state.attributes[index].join('_'))
+  console.log(query)
+
+  let url = new URLSearchParams(window.location.search)
+  url.delete('surldata')
+  url.append('surldata', query)
+  copyUrl.value = window.location.origin + window.location.pathname + '?' + url.toString();
   console.log(copyUrl.value)
   copyUrl.select();
   document.execCommand('copy');
-  totalSelections++
 }
 
 getInnerIndex = (nodeList, target) => {
@@ -145,26 +107,23 @@ var getDocumentSelection = () => {
       }
     }
 
+    let attributes = []
     if (anchorFirst) {
       attributes = [anchorTag, focusTag, anchorElementIndex, focusElementIndex, anchorOffset, focusOffset, innerAnchorIndex, innerFocusIndex]
     } else {
       attributes = [focusTag, anchorTag, focusElementIndex, anchorElementIndex, focusOffset, anchorOffset, innerFocusIndex, innerAnchorIndex]
     }
+    state.appendAttributes(attributes)
+    console.log(state.attributes)
 
     if (highlightSelection(attributes, true)) {
       createSurl(attributes)
     }
-
-    // console.log(document.getElementById("surl-d-container"))
-    // if (document.getElementById("surl-d-container") === null) {
-    //   createDraggable()
-    // } 
-
   }
   return 
 }
 
-if (highlightColor === null) {
+if (state.highlightColor === null) {
   getHighlightColor(false)
 }
 
