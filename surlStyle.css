@@ -39,11 +39,10 @@
 }
 
 #surl-copy {
-    z-index: 1000;
-    height: 0;
-    width: 0;
+    height: 100;
+    width: 100%;
     /* visibility: hidden; */
-    /* top: -100px; */
+    top: -100px;
     position: fixed;
 }
 

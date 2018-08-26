@@ -14,12 +14,13 @@ document.addEventListener('click', (event) => {
 
     for (let index = 0; index < list.length; index++) {
       if (list[index] === event.target) {
-        const remove = 'surl-highlight-'.concat(String(event.target.parentElement.style.order))
+        const order = event.target.parentElement.style.order
+        const remove = 'surl-highlight-'.concat(String(order))
         for (let i = document.getElementsByClassName(remove).length - 1; i > -1; i--) {
           removeHighlight(document.getElementsByClassName(remove)[i])
         }
         state.removeAttributes(index)
-        dragElement.removeItem(index, event.target)
+        dragElement.removeItem(order, event.target)
         createCurl()
       }
     }
@@ -42,7 +43,6 @@ const initData = () => {
     else return element.split('_').map((element) => {return element})
   }); 
 
-  console.log(result)
   state.appendAttributes(result)
 
   for (let i = 1; i < state.attributes[0].length; i++) {
@@ -57,7 +57,6 @@ const main = (index) => {
 
   try {
     var currAttr = state.getAttributes(index)
-    console.log(currAttr)
   
     if (currAttr && state.highlightColor === null) {
       getHighlightColor(true)

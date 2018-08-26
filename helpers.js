@@ -1,6 +1,5 @@
 var arrayRemove = (array, value) => {
   return array.filter(function(element){
-    console.log(element, value)
     return element != value;
   });
 }

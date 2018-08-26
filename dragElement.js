@@ -11,12 +11,11 @@ var dragElement = {
     this.itemList.push(index)
     this.itemList.sort()
 
-    console.log(this.itemList)
     if (this.listComponent === null) {
       this.create(index)
+      return null
     } 
 
-    console.log(this.listComponent, this.containerComponent)
     for (let child of this.listComponent.children) {
       if (Number(child.style.order) === index) return
     }
@@ -42,15 +41,12 @@ var dragElement = {
 
     return null
   },
-  removeItem: function (index, target) {
-    console.log(index, target, this.getIndexFromOrder(index))
+  removeItem: function (order, target) {
     this.listComponent.removeChild(target.parentElement)
-    console.log(arrayRemove(this.itemList, this.getIndexFromOrder(index)))
-    this.itemList = arrayRemove(this.itemList, this.getIndexFromOrder(index))
+    this.itemList = arrayRemove(this.itemList, order)
     if (this.itemList.length === 0) {
       this.hide()
     }
-    console.log(this.itemList)
   },
   create: function (index) {
     chrome.storage.sync.get(['curlDragTop','curlDragLeft'], (data) => {

@@ -50,12 +50,10 @@ var insertHighlight = (range, index) => {
     errorMessage(error, 'Error! Cannot highlight Selection...')
     return null
   }
-  // if (document.getElementById("surl-d-container") === null) {
-  //   // dragElement.create()
-  // } else {
-    dragElement.addItem(index)
-  // }
-  return
+
+  dragElement.addItem(index)
+  
+  return null
 }
 
 /*
@@ -103,14 +101,14 @@ var highlightSelection = (index) => {
   var focusElements = document.querySelectorAll(ft.toLowerCase());
   
   var range = document.createRange();
-  if (!isHighlighted(anchorElements[ai].childNodes)) {
+  if (!isHighlighted(anchorElements[ai].childNodes) || !isHighlighted(focusElements[fi].childNodes)) {
     if (anchorElements[ai].childNodes[iai] === focusElements[fi].childNodes[ifi]) {
       try {
         range.setStart(anchorElements[ai].childNodes[iai], ao)
         range.setEnd(focusElements[fi].childNodes[ifi], fo)
       } catch (error) {
         errorMessage(error, 'Error! Cannot highlight Selection')
-        return
+        return false
       }
       insertHighlight(range, index)
     } else {
@@ -120,7 +118,7 @@ var highlightSelection = (index) => {
         range.setEndAfter(anchorElements[ai].childNodes[iai])
       } catch (error) {
         errorMessage(error, 'Error! Cannot highlight Selection')
-        return
+        return false
       }
       insertHighlight(range, index)
       if (textNodes.length > 0) {
@@ -137,7 +135,7 @@ var highlightSelection = (index) => {
           range.setEnd(focusElements[fi].childNodes[ifi + count], fo)
         } catch (error) {
           errorMessage(error, 'Error! Cannot highlight Selection')
-          return
+          return false
         }
         insertHighlight(range, index)
       } else {
@@ -146,7 +144,7 @@ var highlightSelection = (index) => {
           range.setEnd(focusElements[fi].childNodes[ifi], fo)
         } catch (error) {
           errorMessage(error, 'Error! Cannot highlight Selection')
-          return
+          return false
         }
         insertHighlight(range, index)
       }

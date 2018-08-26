@@ -9,18 +9,22 @@ var createCurl = () => {
     copyUrl.id = 'surl-copy';
     document.body.appendChild(copyUrl);
   }
-
-  let query = Object.keys(state.attributes).map((key, index) => {
-    return state.attributes[index].join('_')
-  }).join('.')
-
-  let url = new URLSearchParams(window.location.search)
-  url.delete('surldata')
-  url.append('surldata', query)
-  copyUrl.value = window.location.origin + window.location.pathname + '?' + url.toString();
-  console.log(copyUrl.value)
-  copyUrl.select();
-  document.execCommand('copy');
+  if (state.attributes[0].length > 0) {
+    copyUrl.style.visibility = 'visibile'
+    let query = Object.keys(state.attributes).map((key, index) => {
+      return state.attributes[index].join('_')
+    }).join('.')
+  
+    let url = new URLSearchParams(window.location.search)
+    url.delete('surldata')
+    url.append('surldata', query)
+    copyUrl.value = window.location.origin + window.location.pathname + '?' + url.toString();
+    
+    copyUrl.select();
+    document.execCommand('copy');
+    copyUrl.style.visibility = 'hidden'
+    console.log(copyUrl.value)
+  }
   return null
 }
 
@@ -37,7 +41,6 @@ var getNodeListIndex = (nodeList, target) => {
 }
 
 var getDocumentSelection = () => {
-  console.log('getDocumentSelection')
   var selection = window.getSelection()
   var setup = false
   try {
@@ -109,7 +112,6 @@ var getDocumentSelection = () => {
     }
 
     if (highlightSelection(state.attributes[0].length - 1)) {
-      console.log('create curl')
       createCurl()
     }
   }
