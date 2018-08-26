@@ -1,10 +1,3 @@
-var isDefined = (value) => {
-  if (typeof value !== 'undefined' || value === null || value === false) {
-    return true
-  }
-  return false
-}
-
 var getTextNodesBetween = (rootNode, startNode, endNode) => {
   var pastStartNode = false, reachedEndNode = false, textNodes = [];
 
@@ -27,32 +20,22 @@ var getTextNodesBetween = (rootNode, startNode, endNode) => {
   return textNodes;
 }
 
-var getHighlightColor = (initial, attributes) => {
+var getHighlightColor = (initial) => {
   let color = ''
   chrome.storage.sync.get("highlightColor", function(color) {
-    highlightColor = color.highlightColor
+    state.highlightColor = color.highlightColor
     if (initial) {
-      goToLocation(attributes.map(a => {return a[index]}), false, 0)
+      goToLocation(false, 0)
     }
-    setColor(highlightColor)
+    state.colorHighlights()
   })
 }
 
-var setColor = (color) => {
-  for (let selection of document.getElementsByClassName(surlClass)) {
-    selection.style.backgroundColor = color
-  }
-}
-
-var getSelectionIndex = () => {
-  if (document.getElementById('surl-copy') ) {
-    document.getElementById('surl-copy').value
-  } else {
-    let curlData = window.location.search
-    const start = chunk.search('surldata=')
-  }
-}
-
+/*
+ * Wraps range with highlight highlight class. Creates a draggable list of selections if one DNE.
+ * range: a selection range object
+ * index: current selection index
+ */
 var insertHighlight = (range, index) => {
   var newNode = document.createElement("div");
   newNode.className = surlClass;
@@ -60,18 +43,21 @@ var insertHighlight = (range, index) => {
   try {
     range.surroundContents(newNode);
   } catch (error) {
-    alert('Error! Cannot highlight Selection...')
-    console.error(error)
+    errorMessage(error, 'Error! Cannot highlight Selection...')
     return null
   }
-  if (document.getElementById("surl-d-container") === null) {
-    dragElement.create()
-  } else {
-    dragElement.append(index)
-  }
+  // if (document.getElementById("surl-d-container") === null) {
+  //   // dragElement.create()
+  // } else {
+    dragElement.addItem(index)
+  // }
   return
 }
 
+/*
+ * Removes highlight class wrappers from a node
+ * node: node to remove highlighted selections from
+ */
 var removeHighlight = (node) => {
   while(node.firstChild) {
     const parent = node.parentNode
@@ -82,20 +68,27 @@ var removeHighlight = (node) => {
   return null
 }
 
-var checkAlreadyInserted = (nodeList) => {
+/*
+ * Returns true if the selection has already been highlighted, else returns false
+ * nodeList: list of nodes to search for highlighted selections
+ */
+var isHighlighted = (nodeList) => {
   let newNodeList = [].slice.call(nodeList)
   for (let i = newNodeList.length - 1; i--;) {
     const classList = newNodeList[i].classList ? [].slice.call(newNodeList[i].classList): null
-    if (classList && classList.includes(surlClass)) {
-      return true
-    }
+    if (classList && classList.includes(surlClass)) return true
   }
   return false
 }
 
-var highlightSelection = (attributes, select, index) => {
+/*
+ * Wraps all text nodes in a specified range with a highlight class.
+ * index: integer describing the current selection index
+ */
+var highlightSelection = (index) => {
   try {
-    var [at, ft, ai, fi, ao, fo, iai, ifi] = attributes;
+    dragElement.getIndexFromOrder(index)
+    var [at, ft, ai, fi, ao, fo, iai, ifi] = state.getAttributes(index);
   } catch (error) {
     console.warn(error)
     return false
@@ -105,17 +98,13 @@ var highlightSelection = (attributes, select, index) => {
   var focusElements = document.querySelectorAll(ft.toLowerCase());
   
   var range = document.createRange();
-  if (select) {
-    index = state.attributes[0].length - 1
-  }
-  if (!checkAlreadyInserted(anchorElements[ai].childNodes)) {
+  if (!isHighlighted(anchorElements[ai].childNodes)) {
     if (anchorElements[ai].childNodes[iai] === focusElements[fi].childNodes[ifi]) {
       try {
         range.setStart(anchorElements[ai].childNodes[iai], ao)
         range.setEnd(focusElements[fi].childNodes[ifi], fo)
       } catch (error) {
-        alert('Error! Cannot highlight Selection')
-        console.error(error)
+        errorMessage(error, 'Error! Cannot highlight Selection')
         return
       }
       insertHighlight(range, index)
@@ -125,8 +114,7 @@ var highlightSelection = (attributes, select, index) => {
         range.setStart(anchorElements[ai].childNodes[iai], ao)
         range.setEndAfter(anchorElements[ai].childNodes[iai])
       } catch (error) {
-        alert('Error! Cannot highlight Selection')
-        console.error(error)
+        errorMessage(error, 'Error! Cannot highlight Selection')
         return
       }
       insertHighlight(range, index)
@@ -143,9 +131,7 @@ var highlightSelection = (attributes, select, index) => {
           range.setStartBefore(focusElements[fi].childNodes[ifi + count])
           range.setEnd(focusElements[fi].childNodes[ifi + count], fo)
         } catch (error) {
-          alert('Error! Cannot highlight Selection')
-          console.error(error)
-          console.log(focusElements[fi].childNodes[ifi + count])
+          errorMessage(error, 'Error! Cannot highlight Selection')
           return
         }
         insertHighlight(range, index)
@@ -154,20 +140,20 @@ var highlightSelection = (attributes, select, index) => {
           range.setStartBefore(focusElements[fi].childNodes[ifi])
           range.setEnd(focusElements[fi].childNodes[ifi], fo)
         } catch (error) {
-          alert('Error! Cannot highlight Selection')
-          console.error(error)
+          errorMessage(error, 'Error! Cannot highlight Selection')
           return
         }
         insertHighlight(range, index)
       }
 
     }
-  } else if (select) {
-    alert('Currently SmartLinks does not support mulitple selections within the same element')
-    return false
-  }
+  } 
+  // case when called from getDocumentSelection
+  // else if (select) {
+  //   alert('Currently SmartLinks does not support mulitple selections within the same element')
+  //   return false
+  // }
 
-  setColor(highlightColor)
+  state.colorHighlights()
   return true
 }
-

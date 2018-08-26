@@ -1,11 +1,9 @@
 /*
- * Unpacks varibales from the url
+ * Called on Page load. Unpacks attribute data from url. Updates state attributes
  */
-
 var initData = () => {
   const queryParams = new URLSearchParams(window.location.search)
   const data = queryParams.get('surldata')
-  console.log(data.split('.'))
 
   if (data === null) return false
 
@@ -14,26 +12,17 @@ var initData = () => {
     else return element.split('_').map((element) => {return element})
   }); 
 
+  console.log(result)
   state.appendAttributes(result)
+
+  for (let i = 1; i < state.attributes[0].length; i++) {
+    dragElement.addItem(i)
+  }
 }
 
-// var getData = (variable) => {
-//   const queryParams = new URLSearchParams(window.location.search)
-//   const data = queryParams.get('surldata')
-//   console.log(data.split('.'))
-
-//   if (data === null) return false
-
-//   let temp = data.split('.').map((element, index) => {
-//     console.log(element, index)
-//     if (index > 1) return element.split('_').map((element) => {return Number(element)})
-//     else return element.split('_').map((element) => {return element})
-//   }); 
-
-//   console.log(temp)
-//   return temp
-// }
-
+/*
+ * Returns element offset.
+ */
 var absoluteOffset = function(element) {
   var top = 0, left = 0;
   do {
@@ -50,15 +39,17 @@ var absoluteOffset = function(element) {
 
 /*
  * Gets Dom element, wraps it with css, and scrolls to it
+ * smoothScroll: boolean, should scroll behabiour be smooth
+ * index: 
  */
-var goToLocation = (attributes, smoothScroll, index) => {
+var goToLocation = (smoothScroll, index) => {
   var scrollBehaviour = smoothScroll ? 'smooth': 'auto'
-  var [at, ft, ai, fi, ao, fo, iai, ifi] = attributes;
+  var [at, ft, ai, fi, ao, fo, iai, ifi] = state.getAttributes(index);
   
   var anchorElements = document.querySelectorAll(at.toLowerCase());
   var focusElements = document.querySelectorAll(ft.toLowerCase());
 
-  highlightSelection(attributes, false, index)
+  highlightSelection(index)
   let offset = absoluteOffset(anchorElements[ai])
 
   // get scrollable element

@@ -6,7 +6,6 @@ document.addEventListener('click', (event) => {
     // Don't follow the link
     event.preventDefault()
     let list = document.querySelectorAll(query1)
- 
     main(Number(event.target.parentElement.style.order))
   } else if (event.target.matches(query2)) {
     // Don't follow the link
@@ -20,7 +19,8 @@ document.addEventListener('click', (event) => {
           removeHighlight(document.getElementsByClassName(remove)[i])
         }
         state.removeAttributes(index)
-        document.getElementById('surl-d-ol').removeChild(event.target.parentElement)
+        dragElement.removeItem(index, event.target)
+        createCurl()
       }
     }
   } else {
@@ -30,29 +30,27 @@ document.addEventListener('click', (event) => {
 
 const main = (index) => {
   try {
-    // attributes = getData('surldata')
-    attributes = state.getAttributes(index)
-    console.log(attributes)
+    var currAttr = state.getAttributes(index)
+    console.log(currAttr)
   
-    if (attributes && highlightColor === null) {
-      getHighlightColor(true, attributes)
+    if (currAttr && state.highlightColor === null) {
+      getHighlightColor(true)
     }
   
-    setup = true
+    var setup = true
   } catch (error) {
     console.warn('Could not go to location: ', error)
     setup = false
   }
   if (setup) {
-    if (attributes) {
-      console.log(attributes)
-      goToLocation(attributes.map(a => {return a[index]}), true, index )
+    if (currAttr) {
+      goToLocation(true, index)
     }
 
     chrome.runtime.onMessage.addListener( function(request, sender, sendResponse) {
       var hMod = request.hMod || null;
       var hColor = request.highlightColor || null;
-  
+      const totalSelections = currAttr.length
       if (hColor) {
         sendResponse(JSON.stringify({hColor: {success: true}}));
   
@@ -61,12 +59,12 @@ const main = (index) => {
       if (hMod) {
         index = index + hMod;
         if (index < 0) {
-          index = attributes[0].length - 1
-        } else if (index >= attributes[0].length) {
+          index = totalSelections - 1
+        } else if (index >= totalSelections) {
           index = 0
         }
-        sendResponse(JSON.stringify({hMod: {index: index + 1, totalAnchors: attributes[0].length, success: true}}));
-        goToLocation(attributes.map(a => {return a[index]}), true)
+        sendResponse(JSON.stringify({hMod: {index: index + 1, totalAnchors: totalSelections, success: true}}));
+        goToLocation(true, index)
       }
       else {
         sendResponse(JSON.stringify({hMod: {index: null, totalAnchors: 0, success: false}}));
@@ -76,9 +74,5 @@ const main = (index) => {
   return
 }
 
-let index = 0;
-let attributes = []
-let setup  = false
-
-initData ()
-main ()
+initData()
+main(0)

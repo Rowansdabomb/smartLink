@@ -1,20 +1,8 @@
-var strSplice = (str, index, add) => {
-  if (index < 0) {
-    index = str.length + index;
-    if (index < 0) {
-      index = 0;
-    }
-  }
-  return str.slice(0, index) + add + str.slice(index);
-}
-
-var arrayRemove = (array, value) => {
-  return array.filter(function(element){
-    return element != value;
-  });
-}
-
-var createSurl = () => {
+/*
+ * Creates the curl link and copies it to the clipboard. 
+ * Returns null
+ */
+var createCurl = () => {
   if (document.getElementById('surl-copy') === null) {
     copyUrl = document.createElement("textarea");
     copyUrl.classList.add('copy-surl')
@@ -22,10 +10,9 @@ var createSurl = () => {
     document.body.appendChild(copyUrl);
   }
 
-  let query = Object.keys(state.attributes).reduce((carry, key, index) => {
-    return carry += '.'.concat(state.attributes[index].join('_'))
-  }, state.attributes[index].join('_'))
-  console.log(query)
+  let query = Object.keys(state.attributes).map((key, index) => {
+    return state.attributes[index].join('_')
+  }).join('.')
 
   let url = new URLSearchParams(window.location.search)
   url.delete('surldata')
@@ -34,18 +21,19 @@ var createSurl = () => {
   console.log(copyUrl.value)
   copyUrl.select();
   document.execCommand('copy');
+  return null
 }
 
-getInnerIndex = (nodeList, target) => {
+/*
+ * Returns the index of a target node in a nodelist, or -1 if the target node is not in the nodelist.
+ */
+var getNodeListIndex = (nodeList, target) => {
   let index = 0
   for (let node of nodeList) {
-    if (node === target) {
-      break
-    }
-    index++
+    if (node === target) return index
+    else index++
   }
-
-  return index
+  return -1
 }
 
 var getDocumentSelection = () => {
@@ -64,8 +52,8 @@ var getDocumentSelection = () => {
     var anchorElements = document.querySelectorAll(anchorTag);
     var focusElements = document.querySelectorAll(focusTag);
 
-    var innerAnchorIndex = getInnerIndex(anchorElement.childNodes, selection.anchorNode)
-    var innerFocusIndex = getInnerIndex(focusElement.childNodes, selection.focusNode)
+    var innerAnchorIndex = getNodeListIndex(anchorElement.childNodes, selection.anchorNode)
+    var innerFocusIndex = getNodeListIndex(focusElement.childNodes, selection.focusNode)
 
     const mask = selection.anchorNode.compareDocumentPosition(selection.focusNode)
     var anchorFirst = true;
@@ -107,17 +95,16 @@ var getDocumentSelection = () => {
       }
     }
 
-    let attributes = []
+    let temp = []
     if (anchorFirst) {
-      attributes = [anchorTag, focusTag, anchorElementIndex, focusElementIndex, anchorOffset, focusOffset, innerAnchorIndex, innerFocusIndex]
+      temp = [anchorTag, focusTag, anchorElementIndex, focusElementIndex, anchorOffset, focusOffset, innerAnchorIndex, innerFocusIndex]
     } else {
-      attributes = [focusTag, anchorTag, focusElementIndex, anchorElementIndex, focusOffset, anchorOffset, innerFocusIndex, innerAnchorIndex]
+      temp = [focusTag, anchorTag, focusElementIndex, anchorElementIndex, focusOffset, anchorOffset, innerFocusIndex, innerAnchorIndex]
     }
-    state.appendAttributes(attributes)
-    console.log(state.attributes)
+    state.appendAttributes(temp)
 
-    if (highlightSelection(attributes, true)) {
-      createSurl(attributes)
+    if (highlightSelection(state.attributes[0].length - 1)) {
+      createCurl()
     }
   }
   return 

@@ -1,11 +1,5 @@
 var initialize = true
 const surlClass = 'surl-highlight'
-var highlightColor = null
-var totalSelections = 0
-var globalIndex = 0
-
-// Global attributes
-var gAttributes = []
 
 var state = {
   attributes: {
@@ -28,15 +22,24 @@ var state = {
     let temp = Object.keys(this.attributes).map((key) => { 
       return this.attributes[key].splice(index, 1)
     })
-    console.log(this.attributes)
   },
   getAttributes: function(index) {
-    return Object.values(this.attributes).reduce((carry, value) => {
-      if (index) {
-        carry = carry.concat(value[index])
+    index = dragElement.getIndexFromOrder(index)
+    let result = []
+    Object.values(this.attributes).map((value, j) => {
+      if (!isDefined(value[index])) throw 'attribute values are not defined'
+      else if (j < 2) {
+        result = [].concat(result, value[index])
       } else {
-        carry = carry.concat([value])
+        result = [].concat(result, Number(value[index]))
       }
-    }, [])
+    })
+    if (result.length === 0) return null
+    else return result
+  },
+  colorHighlights: function() {
+    for (let selection of document.getElementsByClassName(surlClass)) {
+      selection.style.backgroundColor = this.highlightColor
+    }
   }
 }

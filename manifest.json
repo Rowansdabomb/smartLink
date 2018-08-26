@@ -8,7 +8,7 @@
         "persistent": true
     },
     "content_scripts": [{
-        "js": ["globals.js", "common.js", "dragElement.js", "goToLocation.js", "getDocumentSelection.js", "main.js"],
+        "js": ["globals.js", "common.js", "helpers.js", "dragElement.js", "goToLocation.js", "getDocumentSelection.js", "main.js"],
         "matches": ["http://*/*", "https://*/*"],
         "all_frames": false,
         "css": ["surlStyle.css"],
