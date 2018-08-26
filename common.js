@@ -20,11 +20,15 @@ var getTextNodesBetween = (rootNode, startNode, endNode) => {
   return textNodes;
 }
 
-var getHighlightColor = (initial) => {
+/*
+ * Fetches current highlight color from chrome storage
+ * goTo: boolean to determine if screen should scroll to first selection location
+ */
+var getHighlightColor = (goTo) => {
   let color = ''
   chrome.storage.sync.get("highlightColor", function(color) {
     state.highlightColor = color.highlightColor
-    if (initial) {
+    if (goTo) {
       goToLocation(false, 0)
     }
     state.colorHighlights()
@@ -84,6 +88,7 @@ var isHighlighted = (nodeList) => {
 /*
  * Wraps all text nodes in a specified range with a highlight class.
  * index: integer describing the current selection index
+ * return: true if highlightedSelection is valid
  */
 var highlightSelection = (index) => {
   try {

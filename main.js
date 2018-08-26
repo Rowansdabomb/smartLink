@@ -28,7 +28,33 @@ document.addEventListener('click', (event) => {
   }
 }, false);
 
+/*
+ * Called on Page load. Unpacks attribute data from url. Updates state attributes
+ */
+const initData = () => {
+  const queryParams = new URLSearchParams(window.location.search)
+  const data = queryParams.get('surldata')
+
+  if (data === null) return false
+
+  const result = data.split('.').map((element, index) => {
+    if (index > 1) return element.split('_').map((element) => {return Number(element)})
+    else return element.split('_').map((element) => {return element})
+  }); 
+
+  console.log(result)
+  state.appendAttributes(result)
+
+  for (let i = 1; i < state.attributes[0].length; i++) {
+    dragElement.addItem(i)
+  }
+}
+
+/*
+ * Called on Page load. Main function to handle everything
+ */
 const main = (index) => {
+
   try {
     var currAttr = state.getAttributes(index)
     console.log(currAttr)
@@ -42,6 +68,7 @@ const main = (index) => {
     console.warn('Could not go to location: ', error)
     setup = false
   }
+  
   if (setup) {
     if (currAttr) {
       goToLocation(true, index)

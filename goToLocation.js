@@ -1,26 +1,4 @@
 /*
- * Called on Page load. Unpacks attribute data from url. Updates state attributes
- */
-var initData = () => {
-  const queryParams = new URLSearchParams(window.location.search)
-  const data = queryParams.get('surldata')
-
-  if (data === null) return false
-
-  const result = data.split('.').map((element, index) => {
-    if (index > 1) return element.split('_').map((element) => {return Number(element)})
-    else return element.split('_').map((element) => {return element})
-  }); 
-
-  console.log(result)
-  state.appendAttributes(result)
-
-  for (let i = 1; i < state.attributes[0].length; i++) {
-    dragElement.addItem(i)
-  }
-}
-
-/*
  * Returns element offset.
  */
 var absoluteOffset = function(element) {

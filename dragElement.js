@@ -4,15 +4,26 @@ var dragElement = {
   pos3: 0,
   pos4: 0,
   itemList: [],
+  listComponent: null,
+  containerComponent: null,
   addItem: function (index) {
-    if (document.getElementById('surl-d-ol') === null) this.create(index)
 
-    for (let node of document.getElementById('surl-d-ol').children) {
-      if (Number(node.style.order) === index) return
+    this.itemList.push(index)
+    this.itemList.sort()
+
+    console.log(this.itemList)
+    if (this.listComponent === null) {
+      this.create(index)
+    } 
+
+    console.log(this.listComponent, this.containerComponent)
+    for (let child of this.listComponent.children) {
+      if (Number(child.style.order) === index) return
     }
+
     let selection = document.getElementsByClassName(surlClass+'-' + String(index))
-    selection = String(index).concat(selection[0].innerText)
-    let list = document.getElementById('surl-d-ol')
+    selection = String(index+1).concat(' ', selection[0].innerText)
+    
     let listItem = document.createElement('div')
     listItem.classList.add('surl-d-li')
     listItem.style.order = index
@@ -25,15 +36,21 @@ var dragElement = {
     deleteIcon.className = 'surl-d-delete-icon'
     listItem.appendChild(deleteIcon)
   
+    let list = this.listComponent
     list.appendChild(listItem)
+    this.show()
 
-    this.itemList.push(index)
-    this.itemList.sort()
     return null
   },
   removeItem: function (index, target) {
-    document.getElementById('surl-d-ol').removeChild(target.parentElement)
+    console.log(index, target, this.getIndexFromOrder(index))
+    this.listComponent.removeChild(target.parentElement)
+    console.log(arrayRemove(this.itemList, this.getIndexFromOrder(index)))
     this.itemList = arrayRemove(this.itemList, this.getIndexFromOrder(index))
+    if (this.itemList.length === 0) {
+      this.hide()
+    }
+    console.log(this.itemList)
   },
   create: function (index) {
     chrome.storage.sync.get(['curlDragTop','curlDragLeft'], (data) => {
@@ -64,8 +81,11 @@ var dragElement = {
       container.appendChild(list)
     
       document.body.appendChild(container)
+
+      this.containerComponent = container
+      this.listComponent = list
     
-      this.drag(document.getElementById("surl-d-container"));
+      this.drag(this.containerComponent);
       this.addItem(0)
     })
   },
@@ -115,5 +135,11 @@ var dragElement = {
       }
     }
     return index
+  },
+  hide: function() {
+    this.containerComponent.style.display = 'none'
+  },
+  show: function() {
+    this.containerComponent.style.display = 'flex'
   }
 }
