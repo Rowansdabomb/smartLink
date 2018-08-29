@@ -52,7 +52,6 @@
     /* height: 100%; */
     background: #232323;
     z-index: 1000;
-    cursor: pointer;
     display: flex;
     flex-direction: column;
     float: left;
@@ -67,22 +66,27 @@
     justify-content: space-between;
     background-color: #323232;
     color: white;
-    cursor: move;
 }
 
 #surl-d-title {
     padding: 0 10px;
 }
 
-#surl-d-close {
+.surl-d-close {
     height: 30px;
     width: 30px;
-    display: flex;
+    display: flex !important;
     align-items: center;
     justify-content: center;
+    font-size: 16px;
+    transition: color .25s, background-color .25s;
 }
 
-#surl-d-close:hover {
+.surl-d-close>.fa {
+    display: flex;
+}
+
+.surl-d-close:hover {
     cursor: pointer;
     background-color: white;
     color: rgb(80, 139, 248);
@@ -114,6 +118,17 @@
     width: 100%;
 }
 
+.surl-d-li>i {
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: color .25s;
+}
+
+.surl-d-li>i:hover {
+    color: #fc3d32;
+}
+
 .surl-d-li>span {
     white-space: nowrap;
     overflow: hidden;
@@ -122,8 +137,14 @@
     border-radius: 2px;
     margin-right: 10px;
     max-width: 70%;
+    cursor: pointer;
 }
 
 .surl-d-li>span:hover {
     background-color: #323232;
+}
+
+.curl-icon {
+    width: 100%;
+    height: 100%;
 }

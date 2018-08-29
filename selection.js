@@ -106,7 +106,9 @@ var getDocumentSelection = () => {
       temp = [focusTag, anchorTag, focusElementIndex, anchorElementIndex, focusOffset, anchorOffset, innerFocusIndex, innerAnchorIndex]
     }
     try {
-      state.appendAttributes(temp)
+      if (!isHighlighted(anchorElements[anchorElementIndex].childNodes) && !isHighlighted(focusElements[focusElementIndex].childNodes)) {
+        state.appendAttributes(temp)
+      }
     } catch (error) {
       console.error(error)
     }

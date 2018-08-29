@@ -31,8 +31,9 @@ var dragElement = {
     listItemText.innerText = selection
     listItem.appendChild(listItemText)
   
-    let deleteIcon = document.createElement('div')
-    deleteIcon.className = 'surl-d-delete-icon'
+    let deleteIcon = document.createElement('i')
+    deleteIcon.classList.add('fa') 
+    deleteIcon.classList.add('fa-trash') 
     listItem.appendChild(deleteIcon)
   
     let list = this.listComponent
@@ -50,6 +51,13 @@ var dragElement = {
   },
   create: function (index) {
     chrome.storage.sync.get(['curlDragTop','curlDragLeft'], (data) => {
+      var styleNode           = document.createElement ("style");
+      styleNode.type          = "text/css";
+      styleNode.textContent   = "@font-face { font-family: FontAwesome; src: url('"
+                              + chrome.extension.getURL ("fontawesome-webfont.woff")
+                              + "'); }";
+      document.head.appendChild (styleNode);
+
       let container = document.createElement('div')
       container.id = 'surl-d-container'
       container.style.top = 0
@@ -66,10 +74,11 @@ var dragElement = {
       title.id = 'surl-d-title'
       title.innerText = 'Curl Selections'
       header.appendChild(title)
-      let close = document.createElement('div')
-      close.id = 'surl-d-close'
-      var imgURL = chrome.extension.getURL("images/Close-icon.png")
-      close.style.backgroundImage = imgURL
+      let close = document.createElement('i')
+      close.className = 'surl-d-close'
+      close.classList.add('fa')
+      close.classList.add('fa-times')
+
       header.appendChild(close)
     
       let list = document.createElement('div')
@@ -125,14 +134,17 @@ var dragElement = {
     }
   },
   getIndexFromOrder: function(index) {
+    console.log(this.itemList)
     if (this.itemList.length !== 0) {
       for (let i = 0; i < this.itemList.length; i++) {
+        console.log(this.itemList[i])
         if (index === this.itemList[i]) return i
       }
     }
     return index
   },
   hide: function() {
+    console.log('hide the thing')
     this.containerComponent.style.display = 'none'
   },
   show: function() {

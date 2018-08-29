@@ -23,7 +23,11 @@
             "128": "images/Curl-icon-128.png"
         }
     },
-    "web_accessible_resources": ["popup.js"],
+    "web_accessible_resources": [
+        "popup.js",
+        "fonts/fontawesome-webfont.woff",
+        "images/*.png"
+    ],
     "icons": {
         "16": "images/Curl-icon-16.png",
         "32": "images/Curl-icon-32.png",

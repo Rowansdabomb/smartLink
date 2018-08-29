@@ -150,7 +150,9 @@ var highlightSelection = (index) => {
       }
 
     }
-  } 
+  } else {
+    console.log('its already highlighted')
+  }
   // case when called from getDocumentSelection
   // else if (select) {
   //   alert('Currently SmartLinks does not support mulitple selections within the same element')

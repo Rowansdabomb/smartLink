@@ -1,13 +1,13 @@
 document.addEventListener('click', (event) => {
   const query1 = '.surl-d-li>span'
-  const query2 = '.surl-d-delete-icon'
+  const query2 = '.surl-d-li>i'
+  const query3 = '.surl-d-close'
 
   if (event.target.matches(query1)) {
     // Don't follow the link
     event.preventDefault()
-    let list = document.querySelectorAll(query1)
     main(Number(event.target.parentElement.style.order))
-  } else if (event.target.matches(query2)) {
+  } if (event.target.matches(query2)) {
     // Don't follow the link
     event.preventDefault()
     let list = document.querySelectorAll(query2)
@@ -24,6 +24,10 @@ document.addEventListener('click', (event) => {
         createCurl()
       }
     }
+  } else if (event.target.matches(query3)) {
+    // Don't follow the link
+    event.preventDefault()
+    dragElement.hide()
   } else {
     return
   }
@@ -56,6 +60,7 @@ const initData = () => {
 const main = (index) => {
 
   try {
+    console.log(index)
     var currAttr = state.getAttributes(index)
   
     if (currAttr && state.highlightColor === null) {
