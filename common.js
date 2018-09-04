@@ -90,7 +90,6 @@ var isHighlighted = (nodeList) => {
  */
 var highlightSelection = (index) => {
   try {
-    dragElement.getIndexFromOrder(index)
     var [at, ft, ai, fi, ao, fo, iai, ifi] = state.getAttributes(index);
   } catch (error) {
     console.warn(error)
