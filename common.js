@@ -100,6 +100,7 @@ var highlightSelection = (index) => {
   var focusElements = document.querySelectorAll(ft.toLowerCase());
   
   var range = document.createRange();
+  console.log(anchorElements[ai].childNodes, focusElements[fi].childNodes)
   if (!isHighlighted(anchorElements[ai].childNodes) && !isHighlighted(focusElements[fi].childNodes)) {
     if (anchorElements[ai].childNodes[iai] === focusElements[fi].childNodes[ifi]) {
       try {

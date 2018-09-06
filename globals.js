@@ -20,13 +20,12 @@ var state = {
   },
   removeAttributes: function(index) {
     Object.keys(this.attributes).map((key) => { 
-      // this.attributes[key].splice(index, 1)
       this.attributes[key].splice(index, 1)
       return
     })
   },
   getAttributes: function(index) {
-    index = dragElement.getIndexFromOrder(index)
+    index = dragElement.getIndex(index)
     let result = []
     Object.values(this.attributes).map((value, j) => {
       if (!isDefined(value[index])) throw 'attribute values are not defined'

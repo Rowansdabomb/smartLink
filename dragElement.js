@@ -8,21 +8,22 @@ var dragElement = {
   containerComponent: null,
   created: false,
   addItem: function (index) {
-
-    this.list.push(index)
-    this.list.sort()
-
     if (!this.created) {
       this.created = true
       this.create().then((result) => {
-        console.log(result)
-        addTheItem()
+        addTheItem(index)
       })
     } else {
-      addTheItem()
+      console.log('add item')
+      if (this.list.indexOf(index) === -1) {
+        this.list.push(index)
+        this.list.sort()
+      }
+      console.log(this.list)
+      addTheItem(index)
     }
 
-    addTheItem = () => {
+    addTheItem = (index) => {
       for (let child of this.listComponent.children) {
         if (Number(child.style.order) === index) return
       }
@@ -144,8 +145,8 @@ var dragElement = {
       })
     }
   },
-  getIndexFromOrder: function(index) {
-    console.log(this.list)
+  // finds the index of of an attribute based on its order in the drag element list
+  getIndex: function(index) {
     if (this.list.length !== 0) {
       for (let i = 0; i < this.list.length; i++) {
         console.log(this.list[i])
