@@ -14,6 +14,9 @@ const store = new Store({
 })
 
 export default class InjectApp extends React.Component {
+  componentDidMount() {
+
+  }
   render() {
     return(
       <div className='oc-inject-container'>

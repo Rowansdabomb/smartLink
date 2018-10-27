@@ -1,4 +1,5 @@
-export const OC_CLASS = 'surl-highlight'
+export const SL_CLASS = 'surl-highlight'
+export const SL_URL = 'SL_URL'
 
 const initData = () => {
 // Called on Page load. 
@@ -6,7 +7,7 @@ const initData = () => {
 // Updates state attributes
 
   const queryParams = new URLSearchParams(window.location.search)
-  const data = queryParams.get('surldata')
+  const data = queryParams.get('SL_URL')
   
   if (data === null) return false
 
@@ -63,8 +64,8 @@ var wrapRange = (range, index) => {
 // index: current selection index
 
   var newNode = document.createElement("span");
-  newNode.className = OC_CLASS;
-  newNode.classList.add(OC_CLASS + '-' + String(index))
+  newNode.className = SL_CLASS;
+  newNode.classList.add(SL_CLASS + '-' + String(index))
   try {
     range.surroundContents(newNode);
   } catch (error) {
@@ -97,7 +98,7 @@ var isWrapped = (nodeList) => {
   let newNodeList = [].slice.call(nodeList)
   for (let i = newNodeList.length - 1; i--;) {
     const classList = newNodeList[i].classList ? [].slice.call(newNodeList[i].classList): null
-    if (classList && classList.includes(OC_CLASS)) return true
+    if (classList && classList.includes(SL_CLASS)) return true
   }
   return false
 }
@@ -106,10 +107,10 @@ export var wrapSelection = (index, attributes) => {
 // Wraps all text nodes in a specified range with a highlight class.
 // index: integer describing the current selection index
 // return: true if highlightedSelection is valid
-console.log(attributes)
+// console.log(attributes)
   try {
     // var [at, ft, ai, fi, ao, fo, iai, ifi] = state.getAttributes(index);
-    console.log(attributes)
+    // console.log(attributes)
     var [at, ft, ai, fi, ao, fo, iai, ifi] = attributes;
   } catch (error) {
     console.warn(error)
@@ -171,7 +172,7 @@ console.log(attributes)
 
     }
   } else {
-    console.log('its already wraped')
+    console.log('its already wrapped')
   }
   // case when called from getSelection
   // else if (select) {
@@ -250,4 +251,41 @@ export const getSelection = () => {
       return temp
   
   return -1
+}
+
+var absoluteOffset = function(element) {
+// Returns element offset.
+  var top = 0, left = 0;
+  do {
+      top += element.offsetTop  || 0;
+      left += element.offsetLeft || 0;
+      element = element.offsetParent;
+  } while(element);
+
+  return {
+      top: top,
+      left: left
+  };
+};
+
+export const goToLocation = (smoothScroll, anchorTag, anchorIndex) => {
+// Gets Dom element, wraps it with css, and scrolls to it
+// smoothScroll: boolean, should scroll behaviour be smooth
+// index: 
+  var anchorElements = document.querySelectorAll(anchorTag.toLowerCase());
+  console.log(anchorIndex, anchorElements[anchorIndex])
+  let offset = absoluteOffset(anchorElements[anchorIndex])
+
+  // get scrollable element
+  var parent = anchorElements[anchorIndex].parentElement
+  while (parent !== null) {
+    var overflowY = window.getComputedStyle(parent, null).overflowY
+    if (overflowY === 'auto' || overflowY === 'scroll') {
+      parent.scroll({
+        top: offset.top - 200,
+        behavior: smoothScroll ? 'smooth': 'auto'
+      })
+    } 
+    parent = parent.parentElement
+  } 
 }

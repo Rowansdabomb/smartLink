@@ -6,14 +6,15 @@ import {
   getSelection, 
   // copyLinkToClipboard,
   wrapSelection,
-  OC_CLASS
+  SL_CLASS
 } from '../../utils'
 
 import './highlight.css';
 
 import {
   addAttribute,
-  resetAttributes
+  resetAttributes,
+  incrementTotalSelection
 } from '../background/actions'
 
 const store = new Store({
@@ -32,29 +33,30 @@ class Highlight extends React.Component {
   }
 
   componentDidMount() {
-    this.props.resetAttributes()
+    // this.props.resetAttributes()
     chrome.runtime.onMessage.addListener(request => {
       if (request.type === 'GET-SELECTION') {
         let data = getSelection()
         if (data.length === 8) {
           this.props.addAttribute(data)
+          this.props.incrementTotalSelection()
           this.newSelection = true
         } else {
           console.error("attribute length is not 8")
         }
       }
       if (request.type === 'NEW-HIGHLIGHT-COLOR') {
-        console.log('new color selected')
+        // console.log('new color selected')
         this.highlight()
       }
     });
   }
 
   componentDidUpdate(prevProps, prevState) {
-    console.log(this.props.attributes, this.state.index)
-    console.log(this.copyLinkToClipboard())
+    // console.log(this.props.attributes, this.state.index)
+    // console.log(this.copyLinkToClipboard())
     if (this.newSelection) {
-      console.log(this.props.attributes[this.state.index])
+      // console.log(this.props.attributes[this.state.index])
       wrapSelection(this.state.index, this.props.attributes[this.state.index])
       this.highlight()
       this.newSelection = false
@@ -67,8 +69,8 @@ class Highlight extends React.Component {
     }).join('.')
   
     let url = new URLSearchParams(window.location.search)
-    url.delete('surldata')
-    url.append('surldata', query)
+    url.delete('SL_URL')
+    url.append('SL_URL', query)
     
     this.urlCopyRef.current.value = window.location.origin + window.location.pathname + '?' + url.toString();
     
@@ -79,9 +81,9 @@ class Highlight extends React.Component {
   }
 
   highlight = () => {
-    console.log(this.props.highlightColor)
-    for (let selection of document.getElementsByClassName(OC_CLASS)) {
-      console.log(selection)
+    // console.log(this.props.highlightColor)
+    for (let selection of document.getElementsByClassName(SL_CLASS)) {
+      // console.log(selection)
       selection.style.backgroundColor = this.props.highlightColor
     }
     //add element to dragable here
@@ -108,7 +110,8 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   addAttribute: (attributes) => dispatch(addAttribute(attributes)),
-  resetAttributes: () => dispatch(resetAttributes())
+  // resetAttributes: () => dispatch(resetAttributes())
+  incrementTotalSelection: () => dispatch(incrementTotalSelection())
 });
 
 export default connect(

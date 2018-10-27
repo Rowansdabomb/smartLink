@@ -33,12 +33,21 @@ export const setOrigin = (top, left) => ({
   top: top,
   left: left
 })
-export const openDragElement = () => ({
-  type: 'OPEN-DRAG-ELEMENT',
-})
-export const closeDragElement = () => ({
-  type: 'CLOSE-DRAG-ELEMENT',
-})
+// export const addDragItem = (item) => ({
+//   type: 'ADD-DRAG-ITEM',
+//   item: item
+// })
+// export const removeDragItem = (index) => ({
+//   type: 'REMOVE-DRAG-ITEM',
+//   index: index
+// })
+
+// export const openDragElement = () => ({
+//   type: 'OPEN-DRAG-ELEMENT',
+// })
+// export const closeDragElement = () => ({
+//   type: 'CLOSE-DRAG-ELEMENT',
+// })
 
 // ATTRIBUTE ACTIONS
 export const addAttribute = (attributes) => ({

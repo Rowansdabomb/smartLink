@@ -1,12 +1,12 @@
 
 const defaultState = {
-  color: 'transparent',
+  highlightColor: 'transparent',
 }
 
 const colors = (state=defaultState, action) => {
   switch (action.type) {
     case 'SET-HIGHLIGHT-COLOR':
-    console.log('color ', action.value)
+    // console.log('color ', action.value)
       return {
         ...state,
         highlightColor: action.value

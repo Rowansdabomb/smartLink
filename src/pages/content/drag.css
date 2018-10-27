@@ -20,9 +20,9 @@
   color: white;
 }
 
-#oc-d-title {
-  padding: 0 10px;
-  font-size: 1rem;
+.oc-d-title {
+  padding: 5px 10px;
+  font-size: 16px;
 }
 
 .oc-d-close {
@@ -45,7 +45,7 @@
   color: rgb(80, 139, 248);
 }
 
-#oc-d-ol {
+.oc-d-ol {
   display: flex;
   flex-direction: column;
   padding: 10px;

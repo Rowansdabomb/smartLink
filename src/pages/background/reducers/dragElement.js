@@ -1,7 +1,8 @@
 
 const defaultState = {
   origin: [0, 0],
-  isDragOpen: true
+  items: []
+  // isDragOpen: false
 }
 
 const dragElement = (state=defaultState, action) => {
@@ -11,16 +12,26 @@ const dragElement = (state=defaultState, action) => {
         ...state,
         origin: [action.top, action.left]
       }
-    case 'OPEN-DRAG-ELEMENT':
-      return {
-        ...state,
-        isDragOpen: true
-      }
-    case 'CLOSE-DRAG-ELEMENT':
-      return {
-        ...state,
-        isDragOpen: false
-      }
+    // case 'ADD-DRAG-ITEM':
+    //   return {
+    //     ...state,
+    //     items: [...state.items.concat([action.item])]
+    //   }
+    // case 'REMOVE-DRAG-ITEM':
+    //   return {
+    //     ...state,
+    //     items: [...state.items.filter((val, i) => i !== action.index)]
+    //   }
+    // case 'OPEN-DRAG-ELEMENT':
+    //   return {
+    //     ...state,
+    //     isDragOpen: true
+    //   }
+    // case 'CLOSE-DRAG-ELEMENT':
+    //   return {
+    //     ...state,
+    //     isDragOpen: false
+    //   }
   }
   return state
 }

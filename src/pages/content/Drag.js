@@ -6,8 +6,10 @@ import {connect} from 'react-redux';
 import './drag.css';
 
 import {
-  setOrigin
+  setOrigin, closeDragElement, openDragElement
 } from "../background/actions";
+
+import { SL_URL, goToLocation } from '../../utils';
 
 const store = new Store({
   portName: 'OCTOCOMPARE',
@@ -24,14 +26,38 @@ class Drag extends React.Component {
       },
       dragging: false,
       rel: null,
+      open: this.props.attributes.length > 0,
+      items: []
     }
   }
 
-  componentDidUpdate(props, state) {
-    if (this.state.dragging && !state.dragging) {
+  componentDidMount() {
+    let url = new URLSearchParams(window.location.search)
+    if(url.has(SL_URL)) {
+      this.setState({
+        open: true
+      })
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    let tempState = {...this.state}
+    if (prevProps.attributes !== undefined && prevProps.attributes.length !== this.props.attributes.length) {
+      tempState.open = true
+      if (prevProps.attributes.length > this.props.attributes.length) {
+        tempState.items = tempState.concat()
+      } else {
+
+      }
+      console.log('drag open')
+      this.setState({
+        open: true
+      })
+    }
+    if (this.state.dragging && !prevState.dragging) {
       document.addEventListener('mousemove', this.onMouseMove)
       document.addEventListener('mouseup', this.onMouseUp)
-    } else if (!this.state.dragging && state.dragging) {
+    } else if (!this.state.dragging && prevState.dragging) {
       document.removeEventListener('mousemove', this.onMouseMove)
       document.removeEventListener('mouseup', this.onMouseUp)
     }
@@ -69,20 +95,39 @@ class Drag extends React.Component {
     this.props.setOrigin(this.state.pos.y, this.state.pos.x)
   }
 
+  closeDragElement = () => {
+    this.setState({
+      open: false
+    })
+  }
+
+  renderItem = (index, selection) => {
+    const at = this.props.attributes[index][0]
+    const ai = this.props.attributes[index][2]
+    return(
+      <div key={index} className='oc-d-li'>
+        <span onClick={() => {goToLocation(true, at, ai)}}>{selection}{' '}{index}</span>
+        <i className='fa fa-trash' onClick={() => {this.removeDragItem(index)}}></i>  
+      </div>
+    )
+  } 
+
   render() {
     const originStyle = {top: this.state.pos.y, left: this.state.pos.x}
     return(
       <div id='oc-d-wrapper'>
-        {this.props.open && 
+        {this.state.open && 
           <div id='oc-d-container' 
             ref={this.dragElement}
             style={originStyle}>
             <div id='oc-d-header' onMouseDown={(e) => this.onMouseDown(e)}>
               <div className="oc-d-title">Highlight Selections</div>
-              <i className="oc-d-close fa fa-times"></i>
+              <i className="oc-d-close fa fa-times" onClick={() => {this.closeDragElement()}}></i>
             </div>
             <div className="oc-d-ol">
-              a list goes here
+              {this.props.attributes.map((selection, index) => {
+                return(this.renderItem(index, selection))
+              })}
             </div>
           </div>
         }
@@ -93,16 +138,17 @@ class Drag extends React.Component {
 
 const mapStateToProps = (state) => ({
   origin : state.dragElement.origin,
-  open : state.dragElement.isDragOpen
+  attributes: state.attributes.attributes,
+  // isOpen : state.dragElement.isOpen
 });
 
 const mapDispatchToProps = dispatch => ({
-  setOrigin: (top, left) => dispatch(setOrigin(top, left))
+  setOrigin: (top, left) => dispatch(setOrigin(top, left)),
+  // close: () => dispatch(closeDragElement()),
+  // open: () => dispatch(openDragElement())
 });
 
 export default connect(
   mapStateToProps,
   mapDispatchToProps
 )(Drag);
-
-// export default Drag;

@@ -12,14 +12,14 @@ const store = createStore(
 
 store.subscribe(throttle(() => {
   saveState({
-    bookmark: store.getState().bookmark,
-    settings: store.getState().settings,
-    animation: store.getState().animation,
+    // bookmark: store.getState().bookmark,
+    // settings: store.getState().settings,
+    // animation: store.getState().animation,
 
-    // selection: store.getState().selection,
+    // attributes: store.getState().attributes,
     colors: store.getState().colors,
     dragElement: store.getState().dragElement,
-    // attributes: store.getState().attributes,
+    // selection: store.getState().selection,
   })
 }), 1000);
 

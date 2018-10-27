@@ -24,7 +24,7 @@ const colors = {
 class App extends React.Component {
 
   render() {
-    console.log(this.props)
+    // console.log(this.props)
     return (
       <div className='container'>
         <h3>This exstension is in Beta</h3>
@@ -34,7 +34,7 @@ class App extends React.Component {
         <div className='row'>
           {Object.keys(colors).map((key, index) => <ColorSelect key={index} color={colors[key]}/> )}
         </div>
-        <div className='row'>
+        {/* <div className='row'>
             <div  id='prev' 
                 className='button'
                 onClick={() => this.props.decrement()}>Prev</div>
@@ -43,7 +43,7 @@ class App extends React.Component {
                 className='button'
                 onClick={() => this.props.increment()}>Next</div>
 
-        </div>
+        </div> */}
         {/* <div className='row'>
             <div  id='clear' 
                 className='button'
@@ -61,13 +61,13 @@ class App extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  current: state.selection.current,
-  total: state.selection.total,
+  // current: state.selection.current,
+  // total: state.selection.total,
 });
 
 const mapDispatchToProps = dispatch => ({
-  increment: () => dispatch(incrementCurrentSelection()),
-  decrement: () => dispatch(decrementCurrentSelection()),
+  // increment: () => dispatch(incrementCurrentSelection()),
+  // decrement: () => dispatch(decrementCurrentSelection()),
   // incrementTotal: () => dispatch(incrementTotalSelection()),
   // clear: (value) => dispatch(setTotalSelection(value)),
   // reset: (value) => dispatch(setCurrentSelection(value)),
