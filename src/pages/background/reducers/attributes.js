@@ -1,5 +1,6 @@
 const defaultState = {
-  attributes: []
+  attributes: [],
+  index: 0
 }
 
 const attributes = (state=defaultState, action) => {
@@ -7,14 +8,21 @@ const attributes = (state=defaultState, action) => {
     case 'ADD-ATTRIBUTE':
       return {
         ...state,
-        attributes: [...state.attributes.concat([action.attributes])]
+        attributes: [...state.attributes.concat([action.attributes.concat(state.index)])],
+        index: state.index + 1
       }
     case 'REMOVE-ATTRIBUTE':
+      chrome.tabs.query({active: true, currentWindow: true}, tabs => {
+        chrome.tabs.sendMessage(tabs[0].id, {type: 'REMOVE-ATTRIBUTE', index: action.index});
+      });
       return {
         ...state,
         attributes: [...state.attributes.filter((val, i) => i !== action.index)],
       }
     case 'RESET-ATTRIBUTES':
+      chrome.tabs.query({active: true, currentWindow: true}, tabs => {
+        chrome.tabs.sendMessage(tabs[0].id, {type: 'RESET-ATTRIBUTES'});
+      });
       return {
         ...state,
         attributes: []

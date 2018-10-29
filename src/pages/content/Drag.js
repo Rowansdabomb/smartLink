@@ -6,10 +6,14 @@ import {connect} from 'react-redux';
 import './drag.css';
 
 import {
-  setOrigin, closeDragElement, openDragElement
+  setOrigin, 
+  removeAttribute,
 } from "../background/actions";
 
-import { SL_URL, goToLocation } from '../../utils';
+import {
+  SL_URL,
+  goToLocation,
+} from '../../utils';
 
 const store = new Store({
   portName: 'OCTOCOMPARE',
@@ -32,6 +36,7 @@ class Drag extends React.Component {
   }
 
   componentDidMount() {
+    console.log(this.props.attributes)
     let url = new URLSearchParams(window.location.search)
     if(url.has(SL_URL)) {
       this.setState({
@@ -41,15 +46,7 @@ class Drag extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    let tempState = {...this.state}
-    if (prevProps.attributes !== undefined && prevProps.attributes.length !== this.props.attributes.length) {
-      tempState.open = true
-      if (prevProps.attributes.length > this.props.attributes.length) {
-        tempState.items = tempState.concat()
-      } else {
-
-      }
-      console.log('drag open')
+    if ( this.props.attributes.length > 0 && !this.state.open) {
       this.setState({
         open: true
       })
@@ -107,12 +104,14 @@ class Drag extends React.Component {
     return(
       <div key={index} className='oc-d-li'>
         <span onClick={() => {goToLocation(true, at, ai)}}>{selection}{' '}{index}</span>
-        <i className='fa fa-trash' onClick={() => {this.removeDragItem(index)}}></i>  
+        <i className='fa fa-trash' 
+          onClick={() => { this.props.removeAttribute(selection[selection.length - 1])}}></i>  
       </div>
     )
   } 
 
   render() {
+    console.log(this.props)
     const originStyle = {top: this.state.pos.y, left: this.state.pos.x}
     return(
       <div id='oc-d-wrapper'>
@@ -144,6 +143,7 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = dispatch => ({
   setOrigin: (top, left) => dispatch(setOrigin(top, left)),
+  removeAttribute: (index) => dispatch(removeAttribute(index))
   // close: () => dispatch(closeDragElement()),
   // open: () => dispatch(openDragElement())
 });

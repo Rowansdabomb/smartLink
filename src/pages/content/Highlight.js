@@ -3,10 +3,10 @@ import {render} from 'react-dom';
 import {Store} from 'react-chrome-redux';
 import {connect} from 'react-redux';
 import {
+  SL_CLASS,
   getSelection, 
-  // copyLinkToClipboard,
   wrapSelection,
-  SL_CLASS
+  removeHighlight
 } from '../../utils'
 
 import './highlight.css';
@@ -28,44 +28,70 @@ class Highlight extends React.Component {
     this.newSelection = false
     this.state = {
       url: '',
-      index: 0
+      index: 0,
+      removeSelection: null
     }
   }
 
   componentDidMount() {
-    // this.props.resetAttributes()
+    this.props.resetAttributes()
     chrome.runtime.onMessage.addListener(request => {
-      if (request.type === 'GET-SELECTION') {
-        let data = getSelection()
-        if (data.length === 8) {
-          this.props.addAttribute(data)
-          this.props.incrementTotalSelection()
-          this.newSelection = true
-        } else {
-          console.error("attribute length is not 8")
-        }
-      }
-      if (request.type === 'NEW-HIGHLIGHT-COLOR') {
-        // console.log('new color selected')
-        this.highlight()
+      console.log(request.type)
+      switch(request.type) {
+        case 'GET-SELECTION':
+          let data = getSelection()
+          if (data.length === 8) {
+            this.props.addAttribute(data)
+            this.props.incrementTotalSelection()
+            this.newSelection = true
+          } else {
+            console.error("attribute length is not 8")
+          }
+          break
+        case 'NEW-HIGHLIGHT-COLOR':
+          this.highlight()
+          break
+        case 'REMOVE-ATTRIBUTE':
+          this.setState({
+            removeSelection: request.index
+          })
+          break
+        case 'RESET-ATTRIBUTE':
+          nodeList = document.getElementsByClassName(SL_CLASS)
+          for (let i = nodeList.length - 1; i >= 0; i--) {
+            removeHighlight(nodeList[i])
+          }
+          break
       }
     });
   }
 
   componentDidUpdate(prevProps, prevState) {
-    // console.log(this.props.attributes, this.state.index)
-    // console.log(this.copyLinkToClipboard())
+    console.log(this.state.removeSelection !== null)
     if (this.newSelection) {
-      // console.log(this.props.attributes[this.state.index])
-      wrapSelection(this.state.index, this.props.attributes[this.state.index])
+      console.log('before here', this.props.attributes.attributes[this.props.attributes.length - 1])
+      const selection = this.props.attributes.attributes[this.props.attributes.attributes.length - 1]
+      console.log(selection[selection.length - 1], selection)
+      wrapSelection(selection[selection.length - 1], selection)
       this.highlight()
       this.newSelection = false
+    } if (this.state.removeSelection !== null) {
+      let nodeList = document.getElementsByClassName(SL_CLASS + '-' + this.state.removeSelection)
+      console.log(SL_CLASS + '-' + this.state.removeSelection)
+      console.log(nodeList)
+      for (let i = nodeList.length - 1; i >= 0; i--) {
+        // console.log(request.index, nodeList[i])
+        removeHighlight(nodeList[i])
+      }
+      this.setState({
+        removeSelection: null
+      })
     }
   }
   
   copyLinkToClipboard = () => {
-    let query = this.props.attributes.map((key, index) => {
-      return this.props.attributes[index].join('_')
+    let query = this.props.attributes.attributes.map((key, index) => {
+      return this.props.attributes.attributes[index].join('_')
     }).join('.')
   
     let url = new URLSearchParams(window.location.search)
@@ -81,16 +107,9 @@ class Highlight extends React.Component {
   }
 
   highlight = () => {
-    // console.log(this.props.highlightColor)
     for (let selection of document.getElementsByClassName(SL_CLASS)) {
-      // console.log(selection)
       selection.style.backgroundColor = this.props.highlightColor
     }
-    //add element to dragable here
-    this.setState(prevstate => ({
-      index: prevstate.index + 1
-    }))
-
   }
 
   render() {
@@ -104,13 +123,13 @@ class Highlight extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  attributes: state.attributes.attributes,
+  attributes: state.attributes,
   highlightColor: state.colors.highlightColor
 });
 
 const mapDispatchToProps = dispatch => ({
   addAttribute: (attributes) => dispatch(addAttribute(attributes)),
-  // resetAttributes: () => dispatch(resetAttributes())
+  resetAttributes: () => dispatch(resetAttributes()),
   incrementTotalSelection: () => dispatch(incrementTotalSelection())
 });
 

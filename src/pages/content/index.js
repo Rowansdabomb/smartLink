@@ -15,6 +15,7 @@ const store = new Store({
 
 export default class InjectApp extends React.Component {
   componentDidMount() {
+    this.props.state
 
   }
   render() {
@@ -28,8 +29,7 @@ export default class InjectApp extends React.Component {
 }
 
 const mapStateToProps = (state) => ({
-  // settings : state.settings,
-  // animation: state.animation
+  state: state
 });
 
 const ConnectedInjectApp = connect(mapStateToProps)(InjectApp);

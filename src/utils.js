@@ -1,5 +1,5 @@
 export const SL_CLASS = 'surl-highlight'
-export const SL_URL = 'SL_URL'
+export const SL_URL = 'surl-data'
 
 const initData = () => {
 // Called on Page load. 
@@ -44,20 +44,6 @@ var getTextNodesBetween = (rootNode, startNode, endNode) => {
   return textNodes;
 }
 
-// var getHighlightColor = (goTo) => {
-// // Fetches current highlight color from chrome storage
-// // goTo: boolean to determine if screen should scroll to first selection location
-
-//   let color = ''
-//   chrome.storage.sync.get("highlightColor", function(color) {
-//     state.highlightColor = color.highlightColor
-//     if (goTo) {
-//       goToLocation(false, 0)
-//     }
-//     state.colorHighlights()
-//   })
-// }
-
 var wrapRange = (range, index) => {
 // Wraps range with highlight highlight class. Creates a draggable list of selections if one DNE.
 // range: a selection range object
@@ -78,7 +64,7 @@ var wrapRange = (range, index) => {
   return null
 }
 
-var removeHighlight = (node) => {
+export const removeHighlight = (node) => {
 // Removes highlight class wrappers from a node
 // node: node to remove highlighted selections from
 
@@ -109,8 +95,7 @@ export var wrapSelection = (index, attributes) => {
 // return: true if highlightedSelection is valid
 // console.log(attributes)
   try {
-    // var [at, ft, ai, fi, ao, fo, iai, ifi] = state.getAttributes(index);
-    // console.log(attributes)
+    console.log('here', attributes)
     var [at, ft, ai, fi, ao, fo, iai, ifi] = attributes;
   } catch (error) {
     console.warn(error)

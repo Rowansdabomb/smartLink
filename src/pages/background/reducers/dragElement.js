@@ -1,7 +1,7 @@
 
 const defaultState = {
   origin: [0, 0],
-  items: []
+  // items: []
   // isDragOpen: false
 }
 
