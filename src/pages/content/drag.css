@@ -1,0 +1,99 @@
+#oc-d-container {
+  position: fixed;
+  width: 200px;
+  /* height: 100%; */
+  background: #232323;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  float: left;
+  border-radius: 2px;
+  color: white;
+}
+
+#oc-d-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #323232;
+  color: white;
+}
+
+.oc-d-title {
+  padding: 5px 10px;
+  font-size: 16px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.oc-d-close {
+  height: 30px;
+  width: 30px;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  transition: color .25s, background-color .25s;
+}
+
+.oc-d-close>.fa {
+  display: flex;
+}
+
+.oc-d-close:hover {
+  cursor: pointer;
+  background-color: white;
+  color: rgb(80, 139, 248);
+}
+
+.oc-d-ol {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+}
+
+.oc-d-delete-icon {
+  height: 20px;
+  width: 20px;
+  border-radius: 2px;
+  background: red;
+  color: white;
+}
+
+.oc-d-delete-icon:hover {
+  opacity: .6;
+}
+
+.oc-d-li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0;
+  width: 100%;
+}
+
+.oc-d-li>i {
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: color .25s;
+}
+
+.oc-d-li>i:hover {
+  color: #fc3d32;
+}
+
+.oc-d-li>span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 4px 8px;
+  border-radius: 2px;
+  margin-right: 10px;
+  max-width: 70%;
+  cursor: pointer;
+}
+
+.oc-d-li>span:hover {
+  background-color: #323232;
+}
