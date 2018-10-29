@@ -36,4 +36,10 @@ chrome.runtime.onInstalled.addListener(function() {
         actions: [new chrome.declarativeContent.ShowPageAction()]
     }]);
   });
-});
+});(
+
+chrome.tabs.onActivated.addListener(function(tabId, info) {
+  chrome.tabs.query({active: true, currentWindow: true}, tabs => {
+    chrome.tabs.sendMessage(tabs[0].id, {type: 'TAB-CHANGED', currentId: tabs[0].id});
+  });
+}))

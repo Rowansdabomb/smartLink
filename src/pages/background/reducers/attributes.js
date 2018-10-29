@@ -20,6 +20,14 @@ const attributes = (state=defaultState, action) => {
         ...state,
         attributes: [...state.attributes.filter((val, i) => val[val.length - 1] !== action.index)],
       }
+    case 'SET-ATTRIBUTES':
+      chrome.tabs.query({active: true, currentWindow: true}, tabs => {
+        chrome.tabs.sendMessage(tabs[0].id, {type: 'SET-ATTRIBUTES'});
+      });
+      return {
+        ...state,
+        attributes: action.attributes
+      }
     case 'RESET-ATTRIBUTES':
       chrome.tabs.query({active: true, currentWindow: true}, tabs => {
         chrome.tabs.sendMessage(tabs[0].id, {type: 'RESET-ATTRIBUTES'});

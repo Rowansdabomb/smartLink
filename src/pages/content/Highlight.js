@@ -63,6 +63,8 @@ class Highlight extends React.Component {
             removeHighlight(nodeList[i])
           }
           break
+        case 'TAB-CHANGED':
+          console.log(request.currentId)
       }
     });
   }
