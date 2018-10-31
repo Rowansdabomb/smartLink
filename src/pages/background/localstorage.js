@@ -1,12 +1,19 @@
 export const saveState = (state) => {
-  // console.log(Object.keys(state))
   try {
     const serializedState = JSON.stringify(state);
     console.log('SAVE SERIALIZED STATE: ', serializedState)
     localStorage.setItem('state', serializedState);
-    // localStorage.clear()
   } catch (e) {
     console.error('Error saving state', e);
+  }
+}
+
+export const clearState = () => {
+  try {
+    console.log('CLEAR SERIALIZED STATE')
+    localStorage.clear()
+  } catch(e) {
+    console.error('Error clearing state', e);
   }
 }
 
@@ -19,6 +26,6 @@ export const loadState = () => {
     console.log('LOAD SERIALIZED STATE: ', serializedState)
     return JSON.parse(serializedState);
   } catch (e) {
-
+    console.error('Error loading state', e);
   }
 }

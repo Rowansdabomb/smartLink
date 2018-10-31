@@ -12,11 +12,8 @@ const store = createStore(
 
 store.subscribe(throttle(() => {
   saveState({
-    // bookmark: store.getState().bookmark,
-    // settings: store.getState().settings,
-    // animation: store.getState().animation,
 
-    // attributes: store.getState().attributes,
+    attributes: store.getState().attributes,
     colors: store.getState().colors,
     dragElement: store.getState().dragElement,
     // selection: store.getState().selection,

@@ -1,6 +1,7 @@
 const defaultState = {
   attributes: [],
-  index: 0
+  index: 0,
+  tabId: null
 }
 
 const attributes = (state=defaultState, action) => {
@@ -26,7 +27,8 @@ const attributes = (state=defaultState, action) => {
       });
       return {
         ...state,
-        attributes: action.attributes
+        attributes: action.attributes,
+        tabId: action.tabId
       }
     case 'RESET-ATTRIBUTES':
       chrome.tabs.query({active: true, currentWindow: true}, tabs => {

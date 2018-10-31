@@ -2,6 +2,7 @@ import React from 'react';
 import {render} from 'react-dom';
 import {Store} from 'react-chrome-redux';
 import {connect} from 'react-redux';
+import { saveState, loadState } from '../background/localstorage';
 import {
   SL_CLASS,
   getSelection, 
@@ -34,7 +35,7 @@ class Highlight extends React.Component {
   }
 
   componentDidMount() {
-    this.props.resetAttributes()
+    // this.props.resetAttributes()
     chrome.runtime.onMessage.addListener(request => {
       console.log(request.type)
       switch(request.type) {
@@ -52,19 +53,25 @@ class Highlight extends React.Component {
         case 'NEW-HIGHLIGHT-COLOR':
           this.highlight()
           break
-        case 'REMOVE-ATTRIBUTE':
-          this.setState({
-            removeSelection: request.index
-          })
-          break
-        case 'RESET-ATTRIBUTE':
-          nodeList = document.getElementsByClassName(SL_CLASS)
-          for (let i = nodeList.length - 1; i >= 0; i--) {
-            removeHighlight(nodeList[i])
-          }
-          break
-        case 'TAB-CHANGED':
-          console.log(request.currentId)
+        // case 'REMOVE-ATTRIBUTE':
+        //   this.setState({
+        //     removeSelection: request.index
+        //   })
+        //   break
+        // case 'RESET-ATTRIBUTE':
+        //   nodeList = document.getElementsByClassName(SL_CLASS)
+        //   for (let i = nodeList.length - 1; i >= 0; i--) {
+        //     removeHighlight(nodeList[i])
+        //   }
+        //   break
+        // case 'TAB-CHANGED':
+        //   // save attributes/tabId to localStorage
+
+        //   // check local storage for attributes at tabId (request.currentId)
+
+        //     // if in localStorage, this.props.setAttributes()
+        //     // else this.props.resetAttributes(request.currentId)
+        //   console.log(request.currentId)
       }
     });
   }
@@ -133,7 +140,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   addAttribute: (attributes) => dispatch(addAttribute(attributes)),
-  resetAttributes: () => dispatch(resetAttributes()),
+  resetAttributes: (tabId) => dispatch(resetAttributes(tabId)),
   incrementTotalSelection: () => dispatch(incrementTotalSelection())
 });
 

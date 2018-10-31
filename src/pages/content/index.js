@@ -16,7 +16,44 @@ const store = new Store({
 export default class InjectApp extends React.Component {
   componentDidMount() {
     this.props.state
+    chrome.runtime.onMessage.addListener(request => {
+      console.log(request.type)
+      switch(request.type) {
+        // case 'GET-SELECTION':
+        //   let data = getSelection()
+        //   console.log(data)
+        //   if (data.length === 8) {
+        //     this.props.addAttribute(data)
+        //     this.props.incrementTotalSelection()
+        //     this.newSelection = true
+        //   } else {
+        //     console.error("attribute length is not 8")
+        //   }
+        //   break
+        // case 'NEW-HIGHLIGHT-COLOR':
+        //   this.highlight()
+        //   break
+        case 'REMOVE-ATTRIBUTE':
+          this.setState({
+            removeSelection: request.index
+          })
+          break
+        case 'RESET-ATTRIBUTE':
+          nodeList = document.getElementsByClassName(SL_CLASS)
+          for (let i = nodeList.length - 1; i >= 0; i--) {
+            removeHighlight(nodeList[i])
+          }
+          break
+        case 'TAB-CHANGED':
+          // save attributes/tabId to localStorage
 
+          // check local storage for attributes at tabId (request.currentId)
+
+            // if in localStorage, this.props.setAttributes()
+            // else this.props.resetAttributes(request.currentId)
+          console.log(request.currentId)
+      }
+    });
   }
   render() {
     return(
