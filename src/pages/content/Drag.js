@@ -99,7 +99,7 @@ class Drag extends React.Component {
   renderItem = (index, selection) => {
     const at = this.props.attributes[index][0]
     const ai = this.props.attributes[index][2]
-    console.log(selection, selection[selection.length - 1])
+    // console.log(selection, selection[selection.length - 1])
     return(
       <div key={index} className='oc-d-li'>
         <span onClick={() => {goToLocation(true, at, ai)}}>{selection}{' '}{index}</span>

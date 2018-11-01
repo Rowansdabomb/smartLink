@@ -95,7 +95,6 @@ export var wrapSelection = (index, attributes) => {
 // return: true if highlightedSelection is valid
 // console.log(attributes)
   try {
-    console.log('here', attributes)
     var [at, ft, ai, fi, ao, fo, iai, ifi] = attributes;
   } catch (error) {
     console.warn(error)

@@ -9,49 +9,39 @@ import Drag from './Drag.js';
 import './index.css';
 import './drag.css';
 
+import {
+  updateTabId,
+  loadAttributes,
+} from '../background/actions'
+
 const store = new Store({
   portName: 'OCTOCOMPARE',
 })
 
 export default class InjectApp extends React.Component {
+
+  constructor(props){
+    super(props)
+    // this.state = {
+    //   removeSelection: null
+    // }
+  }
   componentDidMount() {
-    this.props.state
+    console.log('INJECT-APP')
+    // this.props.state
+    // this.props.updateTabId()
     chrome.runtime.onMessage.addListener(request => {
-      console.log(request.type)
       switch(request.type) {
-        // case 'GET-SELECTION':
-        //   let data = getSelection()
-        //   console.log(data)
-        //   if (data.length === 8) {
-        //     this.props.addAttribute(data)
-        //     this.props.incrementTotalSelection()
-        //     this.newSelection = true
-        //   } else {
-        //     console.error("attribute length is not 8")
-        //   }
-        //   break
-        // case 'NEW-HIGHLIGHT-COLOR':
-        //   this.highlight()
-        //   break
-        case 'REMOVE-ATTRIBUTE':
-          this.setState({
-            removeSelection: request.index
-          })
-          break
-        case 'RESET-ATTRIBUTE':
-          nodeList = document.getElementsByClassName(SL_CLASS)
-          for (let i = nodeList.length - 1; i >= 0; i--) {
-            removeHighlight(nodeList[i])
-          }
-          break
         case 'TAB-CHANGED':
+          this.props.loadAttributes(request.currentTabId)
+          console.log('TAB-CHANGED')
           // save attributes/tabId to localStorage
 
-          // check local storage for attributes at tabId (request.currentId)
+          // check local storage for attributes at tabId (request.currentTabId)
 
             // if in localStorage, this.props.setAttributes()
-            // else this.props.resetAttributes(request.currentId)
-          console.log(request.currentId)
+            // else this.props.resetAttributes(request.currentTabId)
+          console.log(request.currentTabId)
       }
     });
   }
@@ -66,10 +56,19 @@ export default class InjectApp extends React.Component {
 }
 
 const mapStateToProps = (state) => ({
-  state: state
+  state: state,
+  current: state.attributes
 });
 
-const ConnectedInjectApp = connect(mapStateToProps)(InjectApp);
+const mapDispatchToProps = dispatch => ({
+  loadAttributes: (tabId) => dispatch(loadAttributes(tabId)),
+  updateTabId: (tabId) => dispatch(updateTabId(tabId))
+});
+
+const ConnectedInjectApp = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(InjectApp);
 
 window.addEventListener('load', () => {
   const injectDOM = document.createElement('div');

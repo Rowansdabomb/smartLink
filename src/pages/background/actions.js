@@ -58,12 +58,20 @@ export const removeAttribute = (index) => ({
   type: 'REMOVE-ATTRIBUTE',
   index: index
 })
+export const updateTabId = () => ({
+  type: 'UPDATE-TAB-ID',
+  tabId: tabId
+})
+export const loadAttributes = (tabId) => ({
+  type: 'LOAD-ATTRIBUTES',
+  tabId: tabId
+})
 export const setAttributes = (attributes, tabId) => ({
   type: 'SET-ATTRIBUTES',
   attributes: attributes,
   tabId: tabId
 })
 export const resetAttributes = (tabId) => ({
-  type: 'RESET-ATTRIBUTE',
+  type: 'RESET-ATTRIBUTES',
   tabId: tabId
 })

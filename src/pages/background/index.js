@@ -40,6 +40,23 @@ chrome.runtime.onInstalled.addListener(function() {
 
 chrome.tabs.onActivated.addListener(function(tabId, info) {
   chrome.tabs.query({active: true, currentWindow: true}, tabs => {
-    chrome.tabs.sendMessage(tabs[0].id, {type: 'TAB-CHANGED', currentId: tabs[0].id});
+    chrome.tabs.sendMessage(tabs[0].id, {type: 'TAB-CHANGED', currentTabId: tabs[0].id});
   });
 }))
+
+chrome.tabs.onCreated.addListener(function(tab){
+  console.log(tab)
+})
+
+chrome.runtime.onMessage.addListener(
+  function(request, sender, sendResponse) {
+    // console.log(sender.tab ?
+    //             "from a content script:" + sender.tab.url :
+    //             "from the extension");
+    if (request.message == "INITIALIZE-APP") {
+      chrome.tabs.query({active: true, currentWindow: true}, tabs => {
+        this.props.updateTabId(tabs[0].id)
+      });
+    }
+  });
+

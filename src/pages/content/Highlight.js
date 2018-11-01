@@ -35,9 +35,7 @@ class Highlight extends React.Component {
   }
 
   componentDidMount() {
-    // this.props.resetAttributes()
     chrome.runtime.onMessage.addListener(request => {
-      console.log(request.type)
       switch(request.type) {
         case 'GET-SELECTION':
           let data = getSelection()
@@ -53,35 +51,26 @@ class Highlight extends React.Component {
         case 'NEW-HIGHLIGHT-COLOR':
           this.highlight()
           break
-        // case 'REMOVE-ATTRIBUTE':
-        //   this.setState({
-        //     removeSelection: request.index
-        //   })
-        //   break
-        // case 'RESET-ATTRIBUTE':
-        //   nodeList = document.getElementsByClassName(SL_CLASS)
-        //   for (let i = nodeList.length - 1; i >= 0; i--) {
-        //     removeHighlight(nodeList[i])
-        //   }
-        //   break
-        // case 'TAB-CHANGED':
-        //   // save attributes/tabId to localStorage
-
-        //   // check local storage for attributes at tabId (request.currentId)
-
-        //     // if in localStorage, this.props.setAttributes()
-        //     // else this.props.resetAttributes(request.currentId)
-        //   console.log(request.currentId)
+        case 'REMOVE-ATTRIBUTE':
+          this.setState({
+            removeSelection: request.index
+          })
+          break
+        case 'RESET-ATTRIBUTES':
+          // console.log(nodeList)
+          nodeList = document.getElementsByClassName(SL_CLASS)
+          console.log('RESET then', nodeList)
+          for (let i = nodeList.length - 1; i >= 0; i--) {
+            removeHighlight(nodeList[i])
+          }
+          break
       }
     });
   }
 
   componentDidUpdate(prevProps, prevState) {
-    console.log(this.state.removeSelection !== null)
     if (this.newSelection) {
-      console.log('before here', this.props.attributes.attributes[this.props.attributes.length - 1])
       const selection = this.props.attributes.attributes[this.props.attributes.attributes.length - 1]
-      console.log(selection[selection.length - 1], selection)
       wrapSelection(selection[selection.length - 1], selection)
       this.highlight()
       this.copyLinkToClipboard()
@@ -89,8 +78,6 @@ class Highlight extends React.Component {
     } 
     if (this.state.removeSelection !== null) {
       let nodeList = document.getElementsByClassName(SL_CLASS + '-' + this.state.removeSelection)
-      console.log(SL_CLASS + '-' + this.state.removeSelection)
-      console.log(nodeList)
       for (let i = nodeList.length - 1; i >= 0; i--) {
         removeHighlight(nodeList[i])
       }
