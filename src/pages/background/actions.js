@@ -50,9 +50,10 @@ export const setOrigin = (top, left) => ({
 // })
 
 // ATTRIBUTE ACTIONS
-export const addAttribute = (attributes) => ({
+export const addAttribute = (attributes, url=null) => ({
   type: 'ADD-ATTRIBUTE',
   attributes: attributes,
+  url: url
 })
 export const removeAttribute = (index) => ({
   type: 'REMOVE-ATTRIBUTE',
@@ -60,18 +61,18 @@ export const removeAttribute = (index) => ({
 })
 export const updateTabId = () => ({
   type: 'UPDATE-TAB-ID',
-  tabId: tabId
+  url: url
 })
-export const loadAttributes = (tabId) => ({
+export const loadAttributes = (url) => ({
   type: 'LOAD-ATTRIBUTES',
-  tabId: tabId
+  url: url
 })
-export const setAttributes = (attributes, tabId) => ({
+export const setAttributes = (attributes, url) => ({
   type: 'SET-ATTRIBUTES',
   attributes: attributes,
-  tabId: tabId
+  url: url
 })
-export const resetAttributes = (tabId) => ({
+export const resetAttributes = (url) => ({
   type: 'RESET-ATTRIBUTES',
-  tabId: tabId
+  url: url
 })

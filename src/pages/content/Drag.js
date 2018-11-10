@@ -136,7 +136,7 @@ class Drag extends React.Component {
 
 const mapStateToProps = (state) => ({
   origin : state.dragElement.origin,
-  attributes: state.attributes.attributes,
+  attributes: state.pageData.attributes,
   // isOpen : state.dragElement.isOpen
 });
 

@@ -45,7 +45,9 @@ chrome.tabs.onActivated.addListener(function(tabId, info) {
 }))
 
 chrome.tabs.onCreated.addListener(function(tab){
-  console.log(tab)
+  chrome.tabs.query({active: true, currentWindow: true}, tabs => {
+    chrome.tabs.sendMessage(tabs[0].id, {type: 'TAB-CREATED', currentTabId: tabs[0].id});
+  });
 })
 
 chrome.runtime.onMessage.addListener(

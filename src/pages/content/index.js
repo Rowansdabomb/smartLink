@@ -33,15 +33,20 @@ export default class InjectApp extends React.Component {
     chrome.runtime.onMessage.addListener(request => {
       switch(request.type) {
         case 'TAB-CHANGED':
-          this.props.loadAttributes(request.currentTabId)
-          console.log('TAB-CHANGED')
-          // save attributes/tabId to localStorage
+        console.log('TAB-CHANGED')
+          // this.props.loadAttributes(request.currentTabId)
+          this.props.loadAttributes(window.location.origin + window.location.pathname)
+          
+          // save attributes/url to localStorage
 
-          // check local storage for attributes at tabId (request.currentTabId)
+          // check local storage for attributes at url (request.currentTabId)
 
             // if in localStorage, this.props.setAttributes()
             // else this.props.resetAttributes(request.currentTabId)
           console.log(request.currentTabId)
+          break
+        case 'TAB-CREATED':
+          console.log('TAB-CREATED')
       }
     });
   }
@@ -57,12 +62,12 @@ export default class InjectApp extends React.Component {
 
 const mapStateToProps = (state) => ({
   state: state,
-  current: state.attributes
+  current: state.pageData
 });
 
 const mapDispatchToProps = dispatch => ({
-  loadAttributes: (tabId) => dispatch(loadAttributes(tabId)),
-  updateTabId: (tabId) => dispatch(updateTabId(tabId))
+  loadAttributes: (url) => dispatch(loadAttributes(url)),
+  updateTabId: (url) => dispatch(updateTabId(url))
 });
 
 const ConnectedInjectApp = connect(

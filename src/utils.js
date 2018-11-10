@@ -7,7 +7,7 @@ const initData = () => {
 // Updates state attributes
 
   const queryParams = new URLSearchParams(window.location.search)
-  const data = queryParams.get('SL_URL')
+  const data = queryParams.get(SL_URL)
   
   if (data === null) return false
 
