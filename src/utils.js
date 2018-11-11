@@ -1,26 +1,26 @@
 export const SL_CLASS = 'surl-highlight'
 export const SL_URL = 'surl-data'
 
-const initData = () => {
-// Called on Page load. 
-// Unpacks attribute data from url. 
-// Updates state attributes
+// const initData = () => {
+// // Called on Page load. 
+// // Unpacks attribute data from url. 
+// // Updates state attributes
 
-  const queryParams = new URLSearchParams(window.location.search)
-  const data = queryParams.get(SL_URL)
+//   const queryParams = new URLSearchParams(window.location.search)
+//   const data = queryParams.get(SL_URL)
   
-  if (data === null) return false
+//   if (data === null) return false
 
-  const result = data.split('.').map((element, index) => {
-    if (index > 1) return element.split('_').map((element) => {return Number(element)})
-    else return element.split('_').map((element) => {return element})
-  }); 
-  state.appendAttributes(result)
-  for (let i = 0; i < state.attributes[0].length; i++) {
-    wrapSelection(i)
-    // dragElement.addItem(i)
-  }
-}
+//   const result = data.split('.').map((element, index) => {
+//     if (index > 1) return element.split('_').map((element) => {return Number(element)})
+//     else return element.split('_').map((element) => {return element})
+//   }); 
+//   // state.appendAttributes(result)
+//   for (let i = 0; i < state.attributes[0].length; i++) {
+//     wrapSelection(i)
+//     // dragElement.addItem(i)
+//   }
+// }
 
 var getTextNodesBetween = (rootNode, startNode, endNode) => {
   var pastStartNode = false, reachedEndNode = false, textNodes = [];

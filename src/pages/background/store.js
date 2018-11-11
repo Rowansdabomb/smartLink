@@ -7,7 +7,7 @@ import throttle from 'lodash/throttle';
 import { saveState, loadState } from './localstorage';
 const store = createStore(
   reducer,
-  loadState()
+  loadState(),
 );
 
 store.subscribe(throttle(() => {
@@ -21,6 +21,6 @@ store.subscribe(throttle(() => {
 
 wrapStore(store, {
   portName: 'OCTOCOMPARE',
-})
+}) 
 
 export default store;

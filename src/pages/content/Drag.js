@@ -44,7 +44,12 @@ class Drag extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if ( this.props.attributes.length > prevProps.attributes.length) {
+    if ( this.props.attributes.length === 0 ) {
+      this.setState({
+        open: false
+      })
+    }
+    else if ( this.props.attributes.length > prevProps.attributes.length) {
       this.setState({
         open: true
       })
@@ -99,7 +104,6 @@ class Drag extends React.Component {
   renderItem = (index, selection) => {
     const at = this.props.attributes[index][0]
     const ai = this.props.attributes[index][2]
-    // console.log(selection, selection[selection.length - 1])
     return(
       <div key={index} className='oc-d-li'>
         <span onClick={() => {goToLocation(true, at, ai)}}>{selection}{' '}{index}</span>
@@ -110,7 +114,6 @@ class Drag extends React.Component {
   } 
 
   render() {
-    console.log(this.props)
     const originStyle = {top: this.state.pos.y, left: this.state.pos.x}
     return(
       <div id='oc-d-wrapper'>

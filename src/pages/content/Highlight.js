@@ -15,6 +15,7 @@ import './highlight.css';
 
 import {
   addAttribute,
+  updateUrl,
   resetAttributes,
   incrementTotalSelection
 } from '../background/actions'
@@ -44,7 +45,8 @@ class Highlight extends React.Component {
           let data = getSelection()
           console.log('GET-SELECTION', data)
           if (data.length === 8) {
-            this.props.addAttribute(data, window.location.origin + window.location.pathname)
+            this.props.addAttribute(data)
+            this.props.updateUrl(window.location.origin + window.location.pathname)
             this.props.incrementTotalSelection()
             this.newSelection = true
           } else {
@@ -70,14 +72,28 @@ class Highlight extends React.Component {
       }
     });
     // possibly unpack attributes here?
-
+    console.log(window.location)
+    if (window.location.search.includes(SL_URL)) {
+      const queryParams = new URLSearchParams(window.location.search)
+      const data = queryParams.get(SL_URL)
+      
+      if (data === null) return false
+    
+      const result = data.split('.').map((element, index) => {
+        if (index > 1) return element.split('_').map((element) => {return Number(element)})
+        else return element.split('_').map((element) => {return element})
+      }); 
+      for (let attribute of result) {
+        this.props.addAttribute(attribute)
+      }
+    }
 
     // deal with existing attributes
-    // for (const index in this.props.pageData.attributes){
-    //   const selection = this.props.pageData.attributes[index]
-    //   wrapSelection(selection[selection.length - 1], selection)
-    //   this.highlight()
-    // }
+    for (const index in this.props.pageData.attributes){
+      const selection = this.props.pageData.attributes[index]
+      wrapSelection(selection[selection.length - 1], selection)
+      this.highlight()
+    }
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -144,7 +160,8 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  addAttribute: (attributes, url) => dispatch(addAttribute(attributes, url)),
+  addAttribute: (attributes) => dispatch(addAttribute(attributes)),
+  updateUrl: (url) => dispatch(updateUrl(url)), 
   resetAttributes: (url) => dispatch(resetAttributes(url)),
   incrementTotalSelection: () => dispatch(incrementTotalSelection())
 });

@@ -51,7 +51,7 @@ const attributes = (state=defaultState, action) => {
         index: action.attributes.length - 1,
         url: action.url
       }
-    case 'UPDATE-TAB-ID':
+    case 'UPDATE-URL':
       // chrome.tabs.query({active: true, currentWindow: true}, tabs => {
       //   chrome.tabs.sendMessage(tabs[0].id, {type: 'TAB-CHANGED', currentTabId: tabs[0].id});
       // });
@@ -155,6 +155,7 @@ const attributes = (state=defaultState, action) => {
         url: loadData.url,
         data: newData
       }
+      case 'SAVE-ATTRIBUTES':
   //   case 'RESET-ATTRIBUTES':
   //     // chrome.tabs.query({active: true, currentWindow: true}, tabs => {
   //     //   chrome.tabs.sendMessage(tabs[0].id, {type: 'RESET-ATTRIBUTES'});

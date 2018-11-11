@@ -10,7 +10,8 @@ import './index.css';
 import './drag.css';
 
 import {
-  updateTabId,
+  updateUrl,
+  saveAttributes,
   loadAttributes,
 } from '../background/actions'
 
@@ -29,12 +30,14 @@ export default class InjectApp extends React.Component {
   componentDidMount() {
     console.log('INJECT-APP')
     // this.props.state
-    // this.props.updateTabId()
+    // this.props.updateUrl()
     chrome.runtime.onMessage.addListener(request => {
       switch(request.type) {
         case 'TAB-CHANGED':
         console.log('TAB-CHANGED')
-          // this.props.loadAttributes(request.currentTabId)
+
+          this.props.saveAttributes()
+
           this.props.loadAttributes(window.location.origin + window.location.pathname)
           
           // save attributes/url to localStorage
@@ -66,8 +69,9 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = dispatch => ({
+  saveAttributes: () => dispatch(saveAttributes()),
   loadAttributes: (url) => dispatch(loadAttributes(url)),
-  updateTabId: (url) => dispatch(updateTabId(url))
+  updateUrl: (url) => dispatch(updateUrl(url))
 });
 
 const ConnectedInjectApp = connect(

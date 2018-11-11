@@ -57,7 +57,7 @@ chrome.runtime.onMessage.addListener(
     //             "from the extension");
     if (request.message == "INITIALIZE-APP") {
       chrome.tabs.query({active: true, currentWindow: true}, tabs => {
-        this.props.updateTabId(tabs[0].id)
+        this.props.updateUrl(window.location.origin + window.location.pathname)
       });
     }
   });
