@@ -76,7 +76,7 @@ const attributes = (state=defaultState, action) => {
           if(key === 'length')
             // nothing to load
             break
-          console.log(key, data['url'], action.url)
+          // console.log(key, data['url'], action.url)
 
           if(data['url'] === action.url) {
             console.log("LOAD URL MATCH")
@@ -94,7 +94,7 @@ const attributes = (state=defaultState, action) => {
       
       let tempDataIndex = null
       // if there is something to save, save it
-      console.log(state.url)
+      // console.log(state.url)
       if(state.url !== null) {
         tempDataIndex = 0
         for(let key in state.data) {
@@ -103,8 +103,9 @@ const attributes = (state=defaultState, action) => {
           console.log(key, data['url'], state.url)
           // if(tempDataIndex === state.data['length'])
           //   console.log("SAVE URL NO MATCH")
+          //   tempDataIndex+=1
           //   break
-
+          
           if(data['url'] === state.url) {
             console.log("SAVE URL MATCH")
             break
@@ -113,6 +114,8 @@ const attributes = (state=defaultState, action) => {
           tempDataIndex += 1
           console.log(tempDataIndex)
         }
+        if (tempDataIndex > state.data.length)
+          tempDataIndex = state.data.length
       } else {
         console.log('NO ATTRIBUTES NO SAVE')
       }
