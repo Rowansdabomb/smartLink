@@ -1,6 +1,6 @@
 export const saveState = (state) => {
   try {
-    console.log('SAVE SERIALIZED STATE: ', state.pageData.data)
+    // console.log('SAVE SERIALIZED STATE: ', state.pageData.data)
     const serializedState = JSON.stringify(state);
     localStorage.setItem('state', serializedState);
   } catch (e) {
@@ -18,6 +18,7 @@ export const clearState = () => {
 }
 
 export const loadState = () => {
+  localStorage.clear()
   localStorage.removeItem('state.pageData.data')
   try {
     const serializedState = localStorage.getItem('state');

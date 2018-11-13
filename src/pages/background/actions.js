@@ -71,7 +71,6 @@ export const setAttributes = (attributes, url) => ({
   attributes: attributes,
   url: url
 })
-export const resetAttributes = (url) => ({
+export const resetAttributes = () => ({
   type: 'RESET-ATTRIBUTES',
-  url: url
 })

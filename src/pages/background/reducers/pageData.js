@@ -1,3 +1,5 @@
+import { WSASERVICE_NOT_FOUND } from "constants";
+
 const defaultState = {
   url: null,
   index: 0,
@@ -36,6 +38,7 @@ const attributes = (state=defaultState, action) => {
       chrome.tabs.query({active: true, currentWindow: true}, tabs => {
         chrome.tabs.sendMessage(tabs[0].id, {type: 'REMOVE-ATTRIBUTE', index: action.index});
       });
+      console.log('REMOVE-ATTRIBUTE')
 
       return {
         ...state,
@@ -55,11 +58,29 @@ const attributes = (state=defaultState, action) => {
       // chrome.tabs.query({active: true, currentWindow: true}, tabs => {
       //   chrome.tabs.sendMessage(tabs[0].id, {type: 'TAB-CHANGED', currentTabId: tabs[0].id});
       // });
+      console.log('UPDATE-URL')
       return {
         ...state,
         url: action.url
       }
     case 'LOAD-ATTRIBUTES':
+
+      // LOAD DATA
+      // // find index of attribute to load
+      //   if found
+      //     load pageDAta from index
+      //   else 
+      //     load default pageData
+      // SAVE DATA
+      //   if current data should be stored
+      //     find index of current attributes
+      //       if  found
+      //         update data
+      //       else
+      //         append current data
+
+
+
       // First save current attributes then load 
       // or create attributes for new url
       console.log(' ');
@@ -67,7 +88,10 @@ const attributes = (state=defaultState, action) => {
 
       // initialize loadData as empty
       let loadData = {...defaultState.data['0']}
+      let saveData = {...defaultState.data}
+      let saveDataUpdated = false
 
+      let tempIndex = 0
       // if there is something to load, load it
       if (!state.data.isEmpty()) {
         for(let key in state.data) {
@@ -76,7 +100,6 @@ const attributes = (state=defaultState, action) => {
           if(key === 'length')
             // nothing to load
             break
-          // console.log(key, data['url'], action.url)
 
           if(data['url'] === action.url) {
             console.log("LOAD URL MATCH")
@@ -87,111 +110,84 @@ const attributes = (state=defaultState, action) => {
               url: action.url,
               dataIndex: state.data[key].dataIndex
             }
-            break
           } 
-        }
-      }
-      
-      let tempDataIndex = null
-      // if there is something to save, save it
-      // console.log(state.url)
-      if(state.url !== null) {
-        tempDataIndex = 0
-        for(let key in state.data) {
-          let data = state.data[key]
 
-          console.log(key, data['url'], state.url)
-          // if(tempDataIndex === state.data['length'])
-          //   console.log("SAVE URL NO MATCH")
-          //   tempDataIndex+=1
-          //   break
-          
-          if(data['url'] === state.url) {
-            console.log("SAVE URL MATCH")
-            break
+          if(data['url'] === state.url && state.url !== null){
+            console.log("SAVE URL MATCH", state.url, data['url'])
+            if (state.url !== null) {
+              console.log('SAVE EXISTING')
+              saveData = {
+                ...state.data,
+                [tempIndex]: {
+                  ...state.data[tempIndex],
+                  attributes: [...state.attributes],
+                  index: state.index,
+                  url: state.url,
+                  dataIndex: tempIndex
+                }
+              }
+              saveDataUpdated = true
+            }
           }
-
-          tempDataIndex += 1
-          console.log(tempDataIndex)
+          tempIndex += 1
         }
-        if (tempDataIndex > state.data.length)
-          tempDataIndex = state.data.length
-      } else {
-        console.log('NO ATTRIBUTES NO SAVE')
       }
-
-      let saveData = {}
-      saveData = {
-        attributes: [...state.attributes],
-        index: state.index,
-        url: state.url,
-        dataIndex: tempDataIndex
-      }
-
-      let newData = {}
-
-      if(!saveData.isEmpty() && tempDataIndex !== null) {
-        newData = {
-          ...state.data, 
-          [saveData.dataIndex]: {
-            ...state.data[saveData.dataIndex],
-            ...saveData
+      // if something to save, but not yet in data
+      if (state.url !== null && !saveDataUpdated) {
+        console.log('SAVE NEW')
+        saveData = {
+          ...state.data,
+          [tempIndex]: {
+            ...state.data[tempIndex],
+            attributes: [...state.attributes],
+            index: state.index,
+            url: state.url,
+            dataIndex: tempIndex
           }
         }
-        if (tempDataIndex === state.data['length'])
-          newData.length += 1
-      } else {
-        newData = {...state.data}
       }
 
-      // console.log('newData is ', newData)
-      // console.log('loadData is ', loadData)
-      // console.log('saveData is ', saveData)
+      // console.log('loadData', loadData)
+      // console.log('saveData', saveData)
+
+      if (state.attributes.length > 0 !== null) {
+        return {
+          ...state,
+          attributes: [...loadData.attributes],
+          index: loadData.index,
+          url: loadData.url,
+          // data: {...newData}
+          data: {
+            ...state.data, 
+            // [saveData.dataIndex]: {
+              // ...state.data[saveData.dataIndex],
+              ...saveData
+            // }
+          }
+        }
+      } else {
+        return {
+          ...state,
+          attributes: [...loadData.attributes],
+          index: loadData.index,
+          url: loadData.url
+        }
+      }
+
+      // case 'SAVE-ATTRIBUTES':
+    case 'RESET-ATTRIBUTES':
+      // chrome.tabs.query({active: true, currentWindow: true}, tabs => {
+      //   chrome.tabs.sendMessage(tabs[0].id, {type: 'RESET-ATTRIBUTES'});
+      // });
+      console.log('RESET-ATTRIBUTES')
       
       return {
         ...state,
-        attributes: loadData.attributes,
-        index: loadData.index,
-        url: loadData.url,
-        data: newData
+        attributes: [],
+        index: 0,
+        url: action.url,
+        // data: {...defaultState.data['0']}
       }
-      case 'SAVE-ATTRIBUTES':
-  //   case 'RESET-ATTRIBUTES':
-  //     // chrome.tabs.query({active: true, currentWindow: true}, tabs => {
-  //     //   chrome.tabs.sendMessage(tabs[0].id, {type: 'RESET-ATTRIBUTES'});
-  //     // });
-  //     console.log('RESET-ATTRIBUTES', action.url)
-  //     let oldData = {}
-  //     let index = 0
-  //     for(const data of state.data) {
-  //       console.log(data['url'])
-  //       if(data['url'] === action.url) {
-  //         newData = {
-  //           ...state.data[index], 
-  //           attributes: state.attributes,
-  //           index: state.index,
-  //           url: state.url
-  //         }
-  //         break
-  //       }
-  //       index += 1
-  //     }
-  //     if (index === state.data.length) {
-
-  //     }
-      
-  //     return {
-  //       ...state,
-  //       attributes: [],
-  //       index: 0,
-  //       url: action.url,
-  //       data: [{
-  //         ...state.data[index], 
-  //         attributes: state.attributes,
-  //         index: state.index,
-  //         url: state.url
-  //       }]
-  //     }
   }
   return state
 }

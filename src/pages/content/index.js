@@ -11,8 +11,8 @@ import './drag.css';
 
 import {
   updateUrl,
-  saveAttributes,
   loadAttributes,
+  resetAttributes
 } from '../background/actions'
 
 const store = new Store({
@@ -31,13 +31,11 @@ export default class InjectApp extends React.Component {
     console.log('INJECT-APP')
     // this.props.state
     // this.props.updateUrl()
+    // this.props.resetAttributes()
     chrome.runtime.onMessage.addListener(request => {
       switch(request.type) {
         case 'TAB-CHANGED':
         console.log('TAB-CHANGED')
-
-          this.props.saveAttributes()
-
           this.props.loadAttributes(window.location.origin + window.location.pathname)
           
           // save attributes/url to localStorage
@@ -69,9 +67,9 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  saveAttributes: () => dispatch(saveAttributes()),
   loadAttributes: (url) => dispatch(loadAttributes(url)),
-  updateUrl: (url) => dispatch(updateUrl(url))
+  updateUrl: (url) => dispatch(updateUrl(url)),
+  resetAttributes: () => dispatch(resetAttributes())
 });
 
 const ConnectedInjectApp = connect(
