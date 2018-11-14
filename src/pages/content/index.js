@@ -11,7 +11,6 @@ import './drag.css';
 
 import {
   updateUrl,
-  saveAttributes,
   loadAttributes,
   resetAttributes
 } from '../background/actions'
@@ -26,15 +25,14 @@ export default class InjectApp extends React.Component {
     super(props)
   }
   componentDidMount() {
-    console.log('INJECT-APP', this.props.current)
-    this.props.resetAttributes()
-    this.props.updateUrl(window.location.origin + window.location.pathname)
+    console.log('INJECT-APP')
+    // this.props.state
+    // this.props.updateUrl()
+    // this.props.resetAttributes()
     chrome.runtime.onMessage.addListener(request => {
       switch(request.type) {
         case 'TAB-CHANGED':
-          console.log('TAB-CHANGED')
-
-          // this.props.saveAttributes()
+        console.log('TAB-CHANGED')
           this.props.loadAttributes(window.location.origin + window.location.pathname)
           break
         case 'TAB-CREATED':
@@ -61,10 +59,9 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  updateUrl: (url) => dispatch(updateUrl(url)),
-  saveAttributes: () => dispatch(saveAttributes()),
   loadAttributes: (url) => dispatch(loadAttributes(url)),
-  resetAttributes: () => dispatch(resetAttributes()),
+  updateUrl: (url) => dispatch(updateUrl(url)),
+  resetAttributes: () => dispatch(resetAttributes())
 });
 
 const ConnectedInjectApp = connect(

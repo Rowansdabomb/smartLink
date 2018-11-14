@@ -14,8 +14,9 @@ import {
 import './highlight.css';
 
 import {
-  addAttribute,
   updateUrl,
+  addAttribute,
+  loadAttributes,
   resetAttributes,
   incrementTotalSelection
 } from '../background/actions'
@@ -85,6 +86,8 @@ class Highlight extends React.Component {
       for (let attribute of result) {
         this.props.addAttribute(attribute)
       }
+    } else {
+      this.props.loadAttributes(window.location.origin + window.location.pathname)
     }
 
     //Highlight attributes
@@ -92,11 +95,12 @@ class Highlight extends React.Component {
       const selection = this.props.pageData.attributes[index]
       wrapSelection(selection[selection.length - 1], selection)
       this.highlight()
+      this.copyLinkToClipboard()
     }
   }
 
   componentDidUpdate(prevProps, prevState) {
-    console.log('highlight component did update')
+    console.log(this.props.pageData.attributes)
     // Highlight new selections or pre-existing selections
     if (this.newSelection) {
       const selection = this.props.pageData.attributes[this.props.pageData.attributes.length - 1]
@@ -160,6 +164,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   addAttribute: (attributes) => dispatch(addAttribute(attributes)),
+  loadAttributes: (url) => dispatch(loadAttributes(url)),
   updateUrl: (url) => dispatch(updateUrl(url)), 
   resetAttributes: () => dispatch(resetAttributes()),
   incrementTotalSelection: () => dispatch(incrementTotalSelection())
