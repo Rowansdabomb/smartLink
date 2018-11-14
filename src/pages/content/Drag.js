@@ -44,12 +44,13 @@ class Drag extends React.Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if ( this.props.attributes.length === 0 ) {
+    console.log('from drag', this.props)
+    if ( this.props.attributes.length === 0 && this.state.open) {
       this.setState({
         open: false
       })
     }
-    else if ( this.props.attributes.length > prevProps.attributes.length) {
+    else if ( this.props.attributes.length > prevProps.attributes.length && !this.state.open) {
       this.setState({
         open: true
       })

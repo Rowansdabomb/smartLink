@@ -1,5 +1,13 @@
 export const SL_CLASS = 'surl-highlight'
 export const SL_URL = 'surl-data'
+export const colors = {
+  'orange': '#ff670099',
+  'yellow': '#ffd30099',
+  'green': '#43ae3999',
+  'blue': '#aad5ff99',
+  'red': '#c92e2e99',
+  'none': 'transparent'
+}
 
 // const initData = () => {
 // // Called on Page load. 

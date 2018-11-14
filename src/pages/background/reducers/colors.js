@@ -1,6 +1,6 @@
 
 const defaultState = {
-  highlightColor: 'transparent',
+  highlightColor: '#ffd30099',
 }
 
 const colors = (state=defaultState, action) => {

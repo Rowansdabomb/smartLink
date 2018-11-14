@@ -13,6 +13,7 @@ import {
   updateUrl,
   saveAttributes,
   loadAttributes,
+  resetAttributes
 } from '../background/actions'
 
 const store = new Store({
@@ -23,35 +24,26 @@ export default class InjectApp extends React.Component {
 
   constructor(props){
     super(props)
-    // this.state = {
-    //   removeSelection: null
-    // }
   }
   componentDidMount() {
-    console.log('INJECT-APP')
-    // this.props.state
-    // this.props.updateUrl()
+    console.log('INJECT-APP', this.props.current)
+    this.props.resetAttributes()
+    this.props.updateUrl(window.location.origin + window.location.pathname)
     chrome.runtime.onMessage.addListener(request => {
       switch(request.type) {
         case 'TAB-CHANGED':
-        console.log('TAB-CHANGED')
+          console.log('TAB-CHANGED')
 
-          this.props.saveAttributes()
-
+          // this.props.saveAttributes()
           this.props.loadAttributes(window.location.origin + window.location.pathname)
-          
-          // save attributes/url to localStorage
-
-          // check local storage for attributes at url (request.currentTabId)
-
-            // if in localStorage, this.props.setAttributes()
-            // else this.props.resetAttributes(request.currentTabId)
-          console.log(request.currentTabId)
           break
         case 'TAB-CREATED':
           console.log('TAB-CREATED')
       }
     });
+  }
+  componentDidUpdate() {
+    console.log(this.props.current)
   }
   render() {
     return(
@@ -69,9 +61,10 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = dispatch => ({
+  updateUrl: (url) => dispatch(updateUrl(url)),
   saveAttributes: () => dispatch(saveAttributes()),
   loadAttributes: (url) => dispatch(loadAttributes(url)),
-  updateUrl: (url) => dispatch(updateUrl(url))
+  resetAttributes: () => dispatch(resetAttributes()),
 });
 
 const ConnectedInjectApp = connect(

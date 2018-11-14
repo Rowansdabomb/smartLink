@@ -38,7 +38,6 @@ class Highlight extends React.Component {
   }
 
   componentDidMount() {
-    console.log("highlight did mount")
     chrome.runtime.onMessage.addListener(request => {
       switch(request.type) {
         case 'GET-SELECTION':
@@ -61,19 +60,19 @@ class Highlight extends React.Component {
             removeSelection: request.index
           })
           break
-        case 'RESET-ATTRIBUTES':
-          // console.log(nodeList)
-          nodeList = document.getElementsByClassName(SL_CLASS)
-          console.log('RESET then', nodeList)
-          for (let i = nodeList.length - 1; i >= 0; i--) {
-            removeHighlight(nodeList[i])
-          }
-          break
+        // case 'RESET-ATTRIBUTES':
+        //   nodeList = document.getElementsByClassName(SL_CLASS)
+        //   for (let i = nodeList.length - 1; i >= 0; i--) {
+        //     removeHighlight(nodeList[i])
+        //   }
+        //   break
       }
     });
-    // possibly unpack attributes here?
-    console.log(window.location)
     if (window.location.search.includes(SL_URL)) {
+      //Clear the attributes
+      this.props.resetAttributes()
+
+      //Unpack attributes from url
       const queryParams = new URLSearchParams(window.location.search)
       const data = queryParams.get(SL_URL)
       
@@ -88,7 +87,7 @@ class Highlight extends React.Component {
       }
     }
 
-    // deal with existing attributes
+    //Highlight attributes
     for (const index in this.props.pageData.attributes){
       const selection = this.props.pageData.attributes[index]
       wrapSelection(selection[selection.length - 1], selection)
@@ -162,7 +161,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   addAttribute: (attributes) => dispatch(addAttribute(attributes)),
   updateUrl: (url) => dispatch(updateUrl(url)), 
-  resetAttributes: (url) => dispatch(resetAttributes(url)),
+  resetAttributes: () => dispatch(resetAttributes()),
   incrementTotalSelection: () => dispatch(incrementTotalSelection())
 });
 

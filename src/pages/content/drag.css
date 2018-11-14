@@ -2,13 +2,18 @@
   position: fixed;
   width: 200px;
   /* height: 100%; */
-  background: #232323;
+  background: transparent;
   z-index: 1000;
   display: flex;
   flex-direction: column;
   float: left;
   border-radius: 2px;
-  color: white;
+  color: #4a5960;
+  transition: background-color .25s ease;
+  box-shadow: 0 2px 2px rgba(0,0,0,.24), 0 0 2px rgba(0,0,0,.12);
+}
+#oc-d-container:hover{
+  background-color: white;
 }
 
 #oc-d-header {
@@ -16,8 +21,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: #323232;
-  color: white;
+  cursor: grab;
+  border-bottom: 1px solid #4a5960;
 }
 
 .oc-d-title {
@@ -43,7 +48,7 @@
 .oc-d-close:hover {
   cursor: pointer;
   background-color: white;
-  color: rgb(80, 139, 248);
+  color: #5881b3;
 }
 
 .oc-d-ol {
@@ -71,9 +76,11 @@
   padding: 0;
   width: 100%;
 }
+.oc-d-li>span:hover {
+  color: #5881b3;
+}
 
 .oc-d-li>i {
-  color: white;
   font-size: 16px;
   cursor: pointer;
   transition: color .25s;
@@ -87,13 +94,13 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  padding: 4px 8px;
   border-radius: 2px;
   margin-right: 10px;
   max-width: 70%;
   cursor: pointer;
 }
 
-.oc-d-li>span:hover {
+
+/* .oc-d-li>span:hover {
   background-color: #323232;
-}
+} */

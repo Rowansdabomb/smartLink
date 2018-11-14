@@ -18,6 +18,7 @@ export const clearState = () => {
 }
 
 export const loadState = () => {
+  localStorage.clear()
   localStorage.removeItem('state.pageData.data')
   try {
     const serializedState = localStorage.getItem('state');

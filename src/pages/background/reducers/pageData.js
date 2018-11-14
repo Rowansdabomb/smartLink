@@ -156,42 +156,16 @@ const attributes = (state=defaultState, action) => {
         data: newData
       }
       case 'SAVE-ATTRIBUTES':
-  //   case 'RESET-ATTRIBUTES':
-  //     // chrome.tabs.query({active: true, currentWindow: true}, tabs => {
-  //     //   chrome.tabs.sendMessage(tabs[0].id, {type: 'RESET-ATTRIBUTES'});
-  //     // });
-  //     console.log('RESET-ATTRIBUTES', action.url)
-  //     let oldData = {}
-  //     let index = 0
-  //     for(const data of state.data) {
-  //       console.log(data['url'])
-  //       if(data['url'] === action.url) {
-  //         newData = {
-  //           ...state.data[index], 
-  //           attributes: state.attributes,
-  //           index: state.index,
-  //           url: state.url
-  //         }
-  //         break
-  //       }
-  //       index += 1
-  //     }
-  //     if (index === state.data.length) {
-
-  //     }
-      
-  //     return {
-  //       ...state,
-  //       attributes: [],
-  //       index: 0,
-  //       url: action.url,
-  //       data: [{
-  //         ...state.data[index], 
-  //         attributes: state.attributes,
-  //         index: state.index,
-  //         url: state.url
-  //       }]
-  //     }
+    case 'RESET-ATTRIBUTES':
+      // chrome.tabs.query({active: true, currentWindow: true}, tabs => {
+      //   chrome.tabs.sendMessage(tabs[0].id, {type: 'RESET-ATTRIBUTES'});
+      // });
+      console.log('RESET-ATTRIBUTES')
+      return {
+        ...state,
+        attributes: [],
+        index: 0,
+      }
   }
   return state
 }
