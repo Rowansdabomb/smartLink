@@ -4,16 +4,7 @@ const defaultState = {
   url: null,
   index: 0,
   attributes: [],
-  dataIndex: 0,
-  data: {
-    0:{
-      attributes: [],
-      index: 0,
-      url: null,
-      dataIndex: 0
-    },
-    length: 1
-  }
+  data: []
 }
 
 const attributes = (state=defaultState, action) => {
@@ -65,107 +56,89 @@ const attributes = (state=defaultState, action) => {
       }
     case 'LOAD-ATTRIBUTES':
 
-      // LOAD DATA
-      // // find index of attribute to load
-      //   if found
-      //     load pageDAta from index
-      //   else 
-      //     load default pageData
-      // SAVE DATA
-      //   if current data should be stored
-      //     find index of current attributes
-      //       if  found
-      //         update data
-      //       else
-      //         append current data
-
-
-
       // First save current attributes then load 
       // or create attributes for new url
-      console.log(' ');
+      console.log(' ')
       console.log('LOAD-ATTRIBUTES ', action.url)
+      console.log(state)
+      console.log(' ')
 
       // initialize loadData as empty
-      let loadData = {...defaultState.data['0']}
-      let saveData = {...defaultState.data}
-      let saveDataUpdated = false
+      var loadData = {}
+      var saveData = {}
 
-      let tempIndex = 0
-      // if there is something to load, load it
-      if (!state.data.isEmpty()) {
-        for(let key in state.data) {
-          let data = state.data[key]
-          
-          if(key === 'length')
-            // nothing to load
-            break
-
-          if(data['url'] === action.url) {
-            console.log("LOAD URL MATCH")
-            loadData = {
-              ...state.data[key],  
-              attributes: [...state.data[key].attributes],
-              index: state.data[key].index,
-              url: action.url,
-              dataIndex: state.data[key].dataIndex
-            }
-          } 
-
-          if(data['url'] === state.url && state.url !== null){
-            console.log("SAVE URL MATCH", state.url, data['url'])
-            if (state.url !== null) {
-              console.log('SAVE EXISTING')
-              saveData = {
-                ...state.data,
-                [tempIndex]: {
-                  ...state.data[tempIndex],
-                  attributes: [...state.attributes],
-                  index: state.index,
-                  url: state.url,
-                  dataIndex: tempIndex
-                }
-              }
-              saveDataUpdated = true
-            }
+      var loadIndex = -1
+      var saveIndex = -1
+      for (let [i, data] of state.data.entries()) {
+        // LOAD
+        if (data.url === action.url && loadIndex === -1) {
+          console.log("LOAD URL MATCH")
+          loadData = {
+            ...state.data[i],  
+            attributes: [...state.data[i].attributes],
+            index: state.data[i].index,
+            url: action.url,
           }
-          tempIndex += 1
+          loadIndex = i
         }
-      }
-      // if something to save, but not yet in data
-      if (state.url !== null && !saveDataUpdated) {
-        console.log('SAVE NEW')
-        saveData = {
-          ...state.data,
-          [tempIndex]: {
-            ...state.data[tempIndex],
-            attributes: [...state.attributes],
-            index: state.index,
-            url: state.url,
-            dataIndex: tempIndex
+
+        // SAVE
+        else if (state.url !== null && data.url === state.url && saveIndex === -1) {
+          console.log("SAVE URL MATCH")
+          saveData = state.data.map((item, index) => {
+            if (index !== i) 
+              return item
+            
+            return {
+              ...item,
+              attributes: [...state.attributes],
+              index: state.index,
+              url: state.url
+            }
+          })
+          saveIndex = i
+        }
+
+        if (saveIndex > -1 && loadIndex > -1) {
+          console.log(saveData)
+          console.log(loadData)
+          return {
+            ...state,
+            attributes: [...loadData.attributes],
+            index: loadData.index,
+            url: loadData.url,
+            data: [...saveData]
           }
         }
       }
 
-      // console.log('loadData', loadData)
-      // console.log('saveData', saveData)
+      if (saveData.isEmpty() && state.url !== null) {
+        console.log("SAVE NO URL MATCH")
+        // a shallow copy should be fine here, as we are removing the object from the array anyway
+        saveData = [...state.data]
+        
+        saveData.unshift({
+          attributes: [...state.attributes],
+          index: state.index,
+          url: state.url
+        })
 
-      if (state.attributes.length > 0 !== null) {
+        if (saveData.length > 10) 
+          saveData.pop()
+      }
+
+      console.log(saveData)
+      console.log(loadData)
+
+      if (saveData.isEmpty() && loadData.isEmpty())
         return {
           ...state,
-          attributes: [...loadData.attributes],
-          index: loadData.index,
-          url: loadData.url,
-          // data: {...newData}
-          data: {
-            ...state.data, 
-            // [saveData.dataIndex]: {
-              // ...state.data[saveData.dataIndex],
-              ...saveData
-            // }
-          }
+          attributes: [...defaultState.attributes],
+          index: defaultState.index,
+          url: defaultState.url
         }
-      } else {
+
+      else if (saveData.isEmpty()) {
         return {
           ...state,
           attributes: [...loadData.attributes],
@@ -174,7 +147,16 @@ const attributes = (state=defaultState, action) => {
         }
       }
 
-      // case 'SAVE-ATTRIBUTES':
+      else {
+        return {
+          ...state,
+          attributes: [...defaultState.attributes],
+          index: defaultState.index,
+          url: defaultState.url,
+          data: [...saveData]
+        }
+      }
+
     case 'RESET-ATTRIBUTES':
       // chrome.tabs.query({active: true, currentWindow: true}, tabs => {
       //   chrome.tabs.sendMessage(tabs[0].id, {type: 'RESET-ATTRIBUTES'});
