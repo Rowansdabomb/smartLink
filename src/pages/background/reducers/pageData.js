@@ -55,24 +55,17 @@ const attributes = (state=defaultState, action) => {
         url: action.url
       }
     case 'LOAD-ATTRIBUTES':
-
-      // First save current attributes then load 
-      // or create attributes for new url
-      console.log(' ')
       console.log('LOAD-ATTRIBUTES ', action.url)
-      console.log(state)
-      console.log(' ')
 
-      // initialize loadData as empty
       var loadData = {}
       var saveData = {}
 
       var loadIndex = -1
       var saveIndex = -1
+
       for (let [i, data] of state.data.entries()) {
         // LOAD
         if (data.url === action.url && loadIndex === -1) {
-          console.log("LOAD URL MATCH")
           loadData = {
             ...state.data[i],  
             attributes: [...state.data[i].attributes],
@@ -84,7 +77,6 @@ const attributes = (state=defaultState, action) => {
 
         // SAVE
         else if (state.url !== null && data.url === state.url && saveIndex === -1) {
-          console.log("SAVE URL MATCH")
           saveData = state.data.map((item, index) => {
             if (index !== i) 
               return item
@@ -100,8 +92,6 @@ const attributes = (state=defaultState, action) => {
         }
 
         if (saveIndex > -1 && loadIndex > -1) {
-          console.log(saveData)
-          console.log(loadData)
           return {
             ...state,
             attributes: [...loadData.attributes],
@@ -113,7 +103,6 @@ const attributes = (state=defaultState, action) => {
       }
 
       if (saveData.isEmpty() && state.url !== null) {
-        console.log("SAVE NO URL MATCH")
         // a shallow copy should be fine here, as we are removing the object from the array anyway
         saveData = [...state.data]
         
@@ -123,12 +112,9 @@ const attributes = (state=defaultState, action) => {
           url: state.url
         })
 
-        if (saveData.length > 10) 
+        if (saveData.length > 9) 
           saveData.pop()
       }
-
-      console.log(saveData)
-      console.log(loadData)
 
       if (saveData.isEmpty() && loadData.isEmpty())
         return {
@@ -169,17 +155,6 @@ const attributes = (state=defaultState, action) => {
         index: 0,
         url: action.url,
         // data: {...defaultState.data['0']}
-      }
-      case 'SAVE-ATTRIBUTES':
-    case 'RESET-ATTRIBUTES':
-      // chrome.tabs.query({active: true, currentWindow: true}, tabs => {
-      //   chrome.tabs.sendMessage(tabs[0].id, {type: 'RESET-ATTRIBUTES'});
-      // });
-      console.log('RESET-ATTRIBUTES')
-      return {
-        ...state,
-        attributes: [],
-        index: 0,
       }
   }
   return state

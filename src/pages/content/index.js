@@ -1,13 +1,14 @@
 import React from 'react';
 import { render } from 'react-dom';
-import {Store} from 'react-chrome-redux';
-import {Provider} from 'react-redux'
-import {connect} from 'react-redux';
+import { Store } from 'react-chrome-redux';
+import { Provider } from 'react-redux'
+import { connect } from 'react-redux';
 import Highlight from './Highlight.js'
-import Drag from './Drag.js';
+import Flyout from './Flyout.js';
+import { clearState } from '../background/localstorage.js';
 
 import './index.css';
-import './drag.css';
+import './flyout.css';
 
 import {
   updateUrl,
@@ -26,9 +27,6 @@ export default class InjectApp extends React.Component {
   }
   componentDidMount() {
     console.log('INJECT-APP')
-    // this.props.state
-    // this.props.updateUrl()
-    // this.props.resetAttributes()
     chrome.runtime.onMessage.addListener(request => {
       switch(request.type) {
         case 'TAB-CHANGED':
@@ -37,6 +35,9 @@ export default class InjectApp extends React.Component {
           break
         case 'TAB-CREATED':
           console.log('TAB-CREATED')
+        case 'CLEAR-LOCAL-STORAGE':
+          console.log('CLEAR-LOCAL-STORAGE')
+          clearState()
       }
     });
   }
@@ -47,7 +48,7 @@ export default class InjectApp extends React.Component {
     return(
       <div className='oc-inject-container'>
         <Highlight />
-        <Drag />
+        <Flyout />
       </div>
     )
   }

@@ -27,11 +27,14 @@ export const setColor = (value) => ({
   value: value
 })
 
-// DRAGABLE ACTIONS
+// FLYOUT ACTIONS
 export const setOrigin = (top, left) => ({
-  type: 'SET-DRAG-ELEMENT-ORIGIN',
+  type: 'SET-FLYOUT-ORIGIN',
   top: top,
   left: left
+})
+export const toggleFlyout = () => ({
+  type: 'TOGGLE-FLYOUT',
 })
 // export const addDragItem = (item) => ({
 //   type: 'ADD-DRAG-ITEM',
@@ -42,10 +45,11 @@ export const setOrigin = (top, left) => ({
 //   index: index
 // })
 
-// export const openDragElement = () => ({
+
+// export const openflyout = () => ({
 //   type: 'OPEN-DRAG-ELEMENT',
 // })
-// export const closeDragElement = () => ({
+// export const closeflyout = () => ({
 //   type: 'CLOSE-DRAG-ELEMENT',
 // })
 

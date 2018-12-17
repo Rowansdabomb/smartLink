@@ -1,18 +1,5 @@
 import store from './store';
 
-// store.subscribe (() => {
-//     store.getState().bookmark.tabs.map(infoTab => {
-//       chrome.alarms.create(infoTab.tab[0].url, {when: infoTab.expiry + store.getState().settings.expireDate})
-//     });
-// });
-
-// chrome.alarms.onAlarm.addListener(function (data) {
-//   const elementExpired = store.getState().bookmark.tabs.filter(el => {
-//     return el.tab[0].url === data.name
-//   })
-//   store.dispatch({type:'EXPIRY', url: elementExpired[0].tab[0].url})
-// })
-
 chrome.contextMenus.create({
   id: "some-command",
   title: "Copy Smart Link",
@@ -20,7 +7,6 @@ chrome.contextMenus.create({
  });
 
 chrome.contextMenus.onClicked.addListener(function(info, tab) {
-  // send message to react scripts
   chrome.tabs.query({active: true, currentWindow: true}, tabs => {
     chrome.tabs.sendMessage(tabs[0].id, {type: 'GET-SELECTION'});
   });
@@ -52,9 +38,6 @@ chrome.tabs.onCreated.addListener(function(tab){
 
 chrome.runtime.onMessage.addListener(
   function(request, sender, sendResponse) {
-    // console.log(sender.tab ?
-    //             "from a content script:" + sender.tab.url :
-    //             "from the extension");
     if (request.message == "INITIALIZE-APP") {
       chrome.tabs.query({active: true, currentWindow: true}, tabs => {
         this.props.updateUrl(window.location.origin + window.location.pathname)

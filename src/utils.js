@@ -26,7 +26,7 @@ export const colors = {
 //   // state.appendAttributes(result)
 //   for (let i = 0; i < state.attributes[0].length; i++) {
 //     wrapSelection(i)
-//     // dragElement.addItem(i)
+//     // flyout.addItem(i)
 //   }
 // }
 
@@ -67,7 +67,7 @@ var wrapRange = (range, index) => {
     return null
   }
 
-  // dragElement.addItem(index)
+  // flyout.addItem(index)
   
   return null
 }

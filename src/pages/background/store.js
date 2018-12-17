@@ -14,7 +14,7 @@ store.subscribe(throttle(() => {
   saveState({
     pageData: store.getState().pageData,
     colors: store.getState().colors,
-    dragElement: store.getState().dragElement,
+    flyout: store.getState().flyout,
     // selection: store.getState().selection,
   })
 }), 1000);
