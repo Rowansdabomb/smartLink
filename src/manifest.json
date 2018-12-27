@@ -31,11 +31,12 @@
     "storage",
     "alarms"
   ],
+  "web_accessible_resources":["assets/*.png"],
   "minimum_chrome_version": "60",
   "icons": {
-    "16": "assets/list.png",
-    "48": "assets/list.png",
-    "128": "assets/list128.png"
+    "16": "assets/Curl-icon-16.png",
+    "48": "assets/Curl-icon-48.png",
+    "128": "assets/Curl-icon-128.png"
   },
   "content_security_policy":
     "script-src 'self' https://ssl.google-analytics.com; object-src 'self'"

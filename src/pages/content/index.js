@@ -11,13 +11,13 @@ import './index.css';
 import './flyout.css';
 
 import {
+  reset,
   updateUrl,
-  loadAttributes,
-  resetAttributes
+  loadRangeData,
 } from '../background/actions'
 
 const store = new Store({
-  portName: 'OCTOCOMPARE',
+  portName: 'SMARTLINK',
 })
 
 export default class InjectApp extends React.Component {
@@ -26,24 +26,21 @@ export default class InjectApp extends React.Component {
     super(props)
   }
   componentDidMount() {
-    console.log('INJECT-APP')
     chrome.runtime.onMessage.addListener(request => {
       switch(request.type) {
         case 'TAB-CHANGED':
-        console.log('TAB-CHANGED')
-          this.props.loadAttributes(window.location.origin + window.location.pathname)
+          this.props.loadRangeData(window.location.origin + window.location.pathname)
           break
-        case 'TAB-CREATED':
-          console.log('TAB-CREATED')
         case 'CLEAR-LOCAL-STORAGE':
-          console.log('CLEAR-LOCAL-STORAGE')
           clearState()
+        case 'RESET':
+          this.props.reset()
+          clearState()
+          location.reload()
       }
     });
   }
-  componentDidUpdate() {
-    console.log(this.props.current)
-  }
+  
   render() {
     return(
       <div className='oc-inject-container'>
@@ -60,9 +57,9 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  loadAttributes: (url) => dispatch(loadAttributes(url)),
+  loadRangeData: (url) => dispatch(loadRangeData(url)),
   updateUrl: (url) => dispatch(updateUrl(url)),
-  resetAttributes: () => dispatch(resetAttributes())
+  reset: () => dispatch(reset())
 });
 
 const ConnectedInjectApp = connect(

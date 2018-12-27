@@ -9,26 +9,10 @@ export const colors = {
   'none': 'transparent'
 }
 
-// const initData = () => {
-// // Called on Page load. 
-// // Unpacks attribute data from url. 
-// // Updates state attributes
-
-//   const queryParams = new URLSearchParams(window.location.search)
-//   const data = queryParams.get(SL_URL)
-  
-//   if (data === null) return false
-
-//   const result = data.split('.').map((element, index) => {
-//     if (index > 1) return element.split('_').map((element) => {return Number(element)})
-//     else return element.split('_').map((element) => {return element})
-//   }); 
-//   // state.appendAttributes(result)
-//   for (let i = 0; i < state.attributes[0].length; i++) {
-//     wrapSelection(i)
-//     // flyout.addItem(i)
-//   }
-// }
+const errorMessage = (e, message) => {
+  // window.alert(message)
+  console.error(e)
+}
 
 var getTextNodesBetween = (rootNode, startNode, endNode) => {
   var pastStartNode = false, reachedEndNode = false, textNodes = [];
@@ -97,13 +81,12 @@ var isWrapped = (nodeList) => {
   return false
 }
 
-export var wrapSelection = (index, attributes) => {
+export var wrapSelection = (index, rangeData) => {
 // Wraps all text nodes in a specified range with a highlight class.
 // index: integer describing the current selection index
 // return: true if highlightedSelection is valid
-// console.log(attributes)
   try {
-    var [at, ft, ai, fi, ao, fo, iai, ifi] = attributes;
+    var [at, ft, ai, fi, ao, fo, iai, ifi] = rangeData;
   } catch (error) {
     console.warn(error)
     return false
@@ -113,14 +96,13 @@ export var wrapSelection = (index, attributes) => {
   var focusElements = document.querySelectorAll(ft.toLowerCase());
   
   var range = document.createRange();
-  // console.log(anchorElements[ai].childNodes, focusElements[fi].childNodes)
   if (!isWrapped(anchorElements[ai].childNodes) && !isWrapped(focusElements[fi].childNodes)) {
     if (anchorElements[ai].childNodes[iai] === focusElements[fi].childNodes[ifi]) {
       try {
         range.setStart(anchorElements[ai].childNodes[iai], ao)
         range.setEnd(focusElements[fi].childNodes[ifi], fo)
       } catch (error) {
-        errorMessage(error, 'Error! Cannot wrap Selection')
+        errorMessage(error, 'Cannot wrap Selection')
         return false
       }
       wrapRange(range, index)
@@ -130,7 +112,7 @@ export var wrapSelection = (index, attributes) => {
         range.setStart(anchorElements[ai].childNodes[iai], ao)
         range.setEndAfter(anchorElements[ai].childNodes[iai])
       } catch (error) {
-        errorMessage(error, 'Error! Cannot wrap Selection')
+        errorMessage(error, 'Cannot wrap Selection')
         return false
       }
       wrapRange(range, index)
@@ -147,7 +129,7 @@ export var wrapSelection = (index, attributes) => {
           range.setStartBefore(focusElements[fi].childNodes[ifi + count])
           range.setEnd(focusElements[fi].childNodes[ifi + count], fo)
         } catch (error) {
-          errorMessage(error, 'Error! Cannot wrap Selection')
+          errorMessage(error, 'Cannot wrap Selection')
           return false
         }
         wrapRange(range, index)
@@ -156,23 +138,14 @@ export var wrapSelection = (index, attributes) => {
           range.setStartBefore(focusElements[fi].childNodes[ifi])
           range.setEnd(focusElements[fi].childNodes[ifi], fo)
         } catch (error) {
-          errorMessage(error, 'Error! Cannot wrap Selection')
+          errorMessage(error, 'Cannot wrap Selection')
           return false
         }
         wrapRange(range, index)
       }
 
     }
-  } else {
-    console.log('its already wrapped')
   }
-  // case when called from getSelection
-  // else if (select) {
-  //   alert('Currently SmartLinks does not support mulitple selections within the same element')
-  //   return false
-  // }
-
-  // state.colorHighlights()
   return true
 }
   
@@ -212,7 +185,7 @@ export const getSelection = () => {
         anchorFirst = false
       break
     case mask & 1:
-      console.error('the two nodes do not belong to the same document')
+      errorMessage({}, 'the two nodes do not belong to the same document')
       break
     case mask & 2:
       anchorFirst = false
@@ -242,9 +215,6 @@ export const getSelection = () => {
   
   if (!isWrapped(anchorElements[anchorElementIndex].childNodes) && !isWrapped(focusElements[focusElementIndex].childNodes)) 
       return temp
-  else {
-    console.log('already wrapped! ')
-  }
   
   return -1
 }
@@ -267,9 +237,7 @@ var absoluteOffset = function(element) {
 export const goToLocation = (smoothScroll, anchorTag, anchorIndex) => {
 // Gets Dom element, wraps it with css, and scrolls to it
 // smoothScroll: boolean, should scroll behaviour be smooth
-// index: 
   var anchorElements = document.querySelectorAll(anchorTag.toLowerCase());
-  console.log(anchorIndex, anchorElements[anchorIndex])
   let offset = absoluteOffset(anchorElements[anchorIndex])
 
   // get scrollable element

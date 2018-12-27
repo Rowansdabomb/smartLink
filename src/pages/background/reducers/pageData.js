@@ -3,11 +3,11 @@ import { WSASERVICE_NOT_FOUND } from "constants";
 const defaultState = {
   url: null,
   index: 0,
-  attributes: [],
+  rangeData: [],
   data: []
 }
 
-const attributes = (state=defaultState, action) => {
+const rangeData = (state=defaultState, action) => {
   Object.prototype.isEmpty = function() {
     for(var key in this) {
         if(this.hasOwnProperty(key))
@@ -17,84 +17,78 @@ const attributes = (state=defaultState, action) => {
   }
 
   switch (action.type) {
-    case 'ADD-ATTRIBUTE':
-      console.log('ADD-ATTRIBUTE')
+    case 'ADD-RANGE-DATA':
+      const newRangeData = state.rangeData.length > 8 ? [...state.rangeData] : [...state.rangeData.concat([action.rangeData.concat(state.index)])]
       return {
         ...state,
-        attributes: [...state.attributes.concat([action.attributes.concat(state.index)])],
+        rangeData: newRangeData,
         index: state.index + 1,
         url: action.url
       }
-    case 'REMOVE-ATTRIBUTE':
+
+    case 'REMOVE-RANGE-DATA':
       chrome.tabs.query({active: true, currentWindow: true}, tabs => {
-        chrome.tabs.sendMessage(tabs[0].id, {type: 'REMOVE-ATTRIBUTE', index: action.index});
+        chrome.tabs.sendMessage(tabs[0].id, {type: 'REMOVE-RANGE-DATA', index: action.index});
       });
-      console.log('REMOVE-ATTRIBUTE')
 
       return {
         ...state,
-        attributes: [...state.attributes.filter((val, i) => val[val.length - 1] !== action.index)],
+        rangeData: [...state.rangeData.filter((val, i) => val[val.length - 1] !== action.index)],
       }
-    case 'SET-ATTRIBUTES':
-      // chrome.tabs.query({active: true, currentWindow: true}, tabs => {
-      //   chrome.tabs.sendMessage(tabs[0].id, {type: 'SET-ATTRIBUTES'});
-      // });
+
+    case 'SET-RANGE-DATA':
       return {
         ...state,
-        attributes: action.attributes,
-        index: action.attributes.length - 1,
+        rangeData: action.rangeData,
+        index: action.rangeData.length - 1,
         url: action.url
       }
+
     case 'UPDATE-URL':
-      // chrome.tabs.query({active: true, currentWindow: true}, tabs => {
-      //   chrome.tabs.sendMessage(tabs[0].id, {type: 'TAB-CHANGED', currentTabId: tabs[0].id});
-      // });
-      console.log('UPDATE-URL')
       return {
         ...state,
         url: action.url
       }
-    case 'LOAD-ATTRIBUTES':
-      console.log('LOAD-ATTRIBUTES ', action.url)
 
+    case 'LOAD-RANGE-DATA':
       var loadData = {}
       var saveData = {}
 
-      var loadIndex = -1
-      var saveIndex = -1
+      var loaded = false
+      var saved = true
 
       for (let [i, data] of state.data.entries()) {
         // LOAD
-        if (data.url === action.url && loadIndex === -1) {
+        if (data.url === action.url && !loaded) {
           loadData = {
             ...state.data[i],  
-            attributes: [...state.data[i].attributes],
+            rangeData: [...state.data[i].rangeData],
             index: state.data[i].index,
             url: action.url,
           }
-          loadIndex = i
+          loaded = true
         }
 
         // SAVE
-        else if (state.url !== null && data.url === state.url && saveIndex === -1) {
+        else if (state.url && data.url === state.url && !saved) {
           saveData = state.data.map((item, index) => {
             if (index !== i) 
               return item
             
             return {
               ...item,
-              attributes: [...state.attributes],
+              rangeData: [...state.rangeData],
               index: state.index,
               url: state.url
             }
           })
-          saveIndex = i
+          saved = true
         }
 
-        if (saveIndex > -1 && loadIndex > -1) {
+        if (saved && loaded) {
           return {
             ...state,
-            attributes: [...loadData.attributes],
+            rangeData: [...loadData.rangeData],
             index: loadData.index,
             url: loadData.url,
             data: [...saveData]
@@ -102,12 +96,12 @@ const attributes = (state=defaultState, action) => {
         }
       }
 
-      if (saveData.isEmpty() && state.url !== null) {
+      if (saveData.isEmpty() && state.url) {
         // a shallow copy should be fine here, as we are removing the object from the array anyway
         saveData = [...state.data]
         
         saveData.unshift({
-          attributes: [...state.attributes],
+          rangeData: [...state.rangeData],
           index: state.index,
           url: state.url
         })
@@ -119,7 +113,7 @@ const attributes = (state=defaultState, action) => {
       if (saveData.isEmpty() && loadData.isEmpty())
         return {
           ...state,
-          attributes: [...defaultState.attributes],
+          rangeData: [...defaultState.rangeData],
           index: defaultState.index,
           url: defaultState.url
         }
@@ -127,7 +121,7 @@ const attributes = (state=defaultState, action) => {
       else if (saveData.isEmpty()) {
         return {
           ...state,
-          attributes: [...loadData.attributes],
+          rangeData: [...loadData.rangeData],
           index: loadData.index,
           url: loadData.url
         }
@@ -136,28 +130,27 @@ const attributes = (state=defaultState, action) => {
       else {
         return {
           ...state,
-          attributes: [...defaultState.attributes],
+          rangeData: [...defaultState.rangeData],
           index: defaultState.index,
           url: defaultState.url,
           data: [...saveData]
         }
       }
 
-    case 'RESET-ATTRIBUTES':
-      // chrome.tabs.query({active: true, currentWindow: true}, tabs => {
-      //   chrome.tabs.sendMessage(tabs[0].id, {type: 'RESET-ATTRIBUTES'});
-      // });
-      console.log('RESET-ATTRIBUTES')
-      
+    case 'RESET-RANGE-DATA':
       return {
         ...state,
-        attributes: [],
+        rangeData: [],
         index: 0,
         url: action.url,
-        // data: {...defaultState.data['0']}
+      }
+
+    case 'RESET':
+      return {
+        ...defaultState
       }
   }
   return state
 }
 
-export default attributes;
+export default rangeData;

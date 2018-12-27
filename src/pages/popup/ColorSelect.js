@@ -16,7 +16,6 @@ class ColorSelect extends React.Component {
   }
   render() {
     const backgroundColor = {backgroundColor: this.props.color}
-    // console.log('highlightColor ', this.props.highlightColor)
     return (
       <label className='column'>
         <div className='colorChoice' style={backgroundColor}></div>

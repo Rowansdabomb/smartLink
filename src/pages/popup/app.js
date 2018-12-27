@@ -24,6 +24,12 @@ class App extends React.Component {
     });
   }
 
+  reset = () => {
+    chrome.tabs.query({active: true, currentWindow: true}, tabs => {
+      chrome.tabs.sendMessage(tabs[0].id, {type: 'RESET'});
+    });
+  }
+
   render() {
     return (
       <div className='container'>
@@ -35,17 +41,17 @@ class App extends React.Component {
           {Object.keys(colors).map((key, index) => <ColorSelect key={index} color={colors[key]}/> )}
         </div>
         <div className='row'>
+          <div id='toggle-flyout' 
+                  className='button'
+                  onClick={() => this.props.toggleFlyout()}>
+                    {this.props.flyoutHide ? 'Show Flyout': 'Hide Flyout'}
+              </div>
             <div id='clear-data' 
                 className='button'
-                onClick={() => this.clearLocalStorage()}>Clear Stored Data</div>
+                onClick={() => this.clearLocalStorage()}>Reset All</div>
+
         </div>
-        <div className='row'>
-            <div id='toggle-flyout' 
-                className='button'
-                onClick={() => this.props.toggleFlyout()}>
-                  {this.props.flyoutHide ? 'Show Flyout': 'Hide Flyout'}
-            </div>
-        </div>
+
       </div>
     )
   }

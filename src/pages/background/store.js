@@ -15,12 +15,11 @@ store.subscribe(throttle(() => {
     pageData: store.getState().pageData,
     colors: store.getState().colors,
     flyout: store.getState().flyout,
-    // selection: store.getState().selection,
   })
 }), 1000);
 
 wrapStore(store, {
-  portName: 'OCTOCOMPARE',
+  portName: 'SMARTLINK',
 }) 
 
 export default store;

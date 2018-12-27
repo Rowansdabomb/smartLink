@@ -15,21 +15,20 @@ import './highlight.css';
 
 import {
   updateUrl,
-  addAttribute,
-  loadAttributes,
-  resetAttributes,
+  addRangeData,
+  loadRangeData,
+  resetRangeData,
   incrementTotalSelection
 } from '../background/actions'
 
 const store = new Store({
-  portName: 'OCTOCOMPARE',
+  portName: 'SMARTLINK',
 })
 
 class Highlight extends React.Component {
   constructor(props) {
     super(props)
     this.urlCopyRef = React.createRef()
-    this.newSelection = false
     this.init = false // should only be used on refresh
     this.state = {
       url: '',
@@ -43,90 +42,89 @@ class Highlight extends React.Component {
       switch(request.type) {
         case 'GET-SELECTION':
           let data = getSelection()
-          console.log('GET-SELECTION', data)
           if (data.length === 8) {
-            this.props.addAttribute(data)
+            this.props.addRangeData(data)
             this.props.updateUrl(window.location.origin + window.location.pathname)
             this.props.incrementTotalSelection()
-            this.newSelection = true
           } else {
-            console.error("attribute length is not 8")
+            console.error("rangeData length is not 8")
           }
           break
         case 'NEW-HIGHLIGHT-COLOR':
           this.highlight()
           break
-        case 'REMOVE-ATTRIBUTE':
-          this.setState({
-            removeSelection: request.index
-          })
+        case 'REMOVE-RANGE-DATA':
+          let nodeList = document.getElementsByClassName(SL_CLASS + '-' + request.index)
+          for (let i = nodeList.length - 1; i >= 0; i--) {
+            removeHighlight(nodeList[i])
+          }
           break
-        // case 'RESET-ATTRIBUTES':
-        //   nodeList = document.getElementsByClassName(SL_CLASS)
-        //   for (let i = nodeList.length - 1; i >= 0; i--) {
-        //     removeHighlight(nodeList[i])
-        //   }
-        //   break
+        case 'RESET':
+          nodeList = document.getElementsByClassName(SL_CLASS)
+          for (let i = nodeList.length - 1; i >= 0; i--) {
+            removeHighlight(nodeList[i])
+          }
+          break
       }
     });
-    if (window.location.search.includes(SL_URL)) {
-      //Clear the attributes
-      this.props.resetAttributes()
+    this.unpackURL()
+  }
 
-      //Unpack attributes from url
+  componentDidUpdate(prevProps, prevState) {
+    // Highlight new selections or pre-existing selections
+    console.log("current", this.props.pageData)
+    console.log("prev", prevProps.pageData.rangeData)
+    if (this.props.pageData.rangeData.length > prevProps.pageData.rangeData.length) {
+      console.log('wrapSelection')
+      const selection = this.props.pageData.rangeData[this.props.pageData.rangeData.length - 1]
+      wrapSelection(selection[selection.length - 1], selection)
+      this.highlight()
+      this.copyLinkToClipboard()
+      
+      if (this.init) {
+        this.init = false;
+      }
+    }
+  }
+
+  unpackURL = () => {
+    if (window.location.search.includes(SL_URL)) {
+      //Clear the rangeData
+      this.props.resetRangeData()
+
+      //Unpack rangeData from url
       const queryParams = new URLSearchParams(window.location.search)
       const data = queryParams.get(SL_URL)
       
       if (data === null) return false
     
-      const result = data.split('.').map((element, index) => {
-        if (index > 1) return element.split('_').map((element) => {return Number(element)})
-        else return element.split('_').map((element) => {return element})
+      const result = data.split('.').map((element) => {
+        return element.split('_').map((element, index) => {
+          if (index > 1) 
+           return Number(element)
+          return element
+        })
       }); 
-      for (let attribute of result) {
-        this.props.addAttribute(attribute)
+      for (let rangeData of result) {
+        this.props.addRangeData(rangeData)
       }
+      this.props.updateUrl(window.location.origin + window.location.pathname)
     } else {
-      this.props.loadAttributes(window.location.origin + window.location.pathname)
+      this.props.loadRangeData(window.location.origin + window.location.pathname)
     }
 
-    //Highlight attributes
-    for (const index in this.props.pageData.attributes){
-      const selection = this.props.pageData.attributes[index]
+    //Highlight rangeData
+    for (const index in this.props.pageData.rangeData){
+      const selection = this.props.pageData.rangeData[index]
       wrapSelection(selection[selection.length - 1], selection)
       this.highlight()
       this.copyLinkToClipboard()
-    }
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    console.log(this.props.pageData.attributes)
-    // Highlight new selections or pre-existing selections
-    if (this.newSelection) {
-      const selection = this.props.pageData.attributes[this.props.pageData.attributes.length - 1]
-      wrapSelection(selection[selection.length - 1], selection)
-      this.highlight()
-      this.copyLinkToClipboard()
-      
-      this.newSelection = false
-      if (this.init) {
-        this.init = false;
-      }
-    } 
-    if (this.state.removeSelection !== null) {
-      let nodeList = document.getElementsByClassName(SL_CLASS + '-' + this.state.removeSelection)
-      for (let i = nodeList.length - 1; i >= 0; i--) {
-        removeHighlight(nodeList[i])
-      }
-      this.setState({
-        removeSelection: null
-      })
     }
   }
   
   copyLinkToClipboard = () => {
-    let query = this.props.pageData.attributes.map((key, index) => {
-      return this.props.pageData.attributes[index].join('_')
+    let query = this.props.pageData.rangeData.map((key, index) => {
+      return this.props.pageData.rangeData[index].join('_')
     }).join('.')
   
     let url = new URLSearchParams(window.location.search)
@@ -163,10 +161,10 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  addAttribute: (attributes) => dispatch(addAttribute(attributes)),
-  loadAttributes: (url) => dispatch(loadAttributes(url)),
+  addRangeData: (rangeData) => dispatch(addRangeData(rangeData)),
+  loadRangeData: (url) => dispatch(loadRangeData(url)),
   updateUrl: (url) => dispatch(updateUrl(url)), 
-  resetAttributes: () => dispatch(resetAttributes()),
+  resetRangeData: () => dispatch(resetRangeData()),
   incrementTotalSelection: () => dispatch(incrementTotalSelection())
 });
 

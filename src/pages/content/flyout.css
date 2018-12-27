@@ -1,6 +1,6 @@
 #oc-d-container {
   position: fixed;
-  width: 200px;
+  width: 220px;
   /* height: 100%; */
   background: transparent;
   z-index: 1000;
@@ -11,6 +11,7 @@
   color: #4a5960;
   transition: background-color .25s ease;
   box-shadow: 0 2px 2px rgba(0,0,0,.24), 0 0 2px rgba(0,0,0,.12);
+  cursor: default;
 }
 #oc-d-container:hover{
   background-color: white;
@@ -21,14 +22,25 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  cursor: grab;
   border-bottom: 1px solid #4a5960;
 }
 
 .oc-d-title {
   padding: 5px 10px;
-  font-size: 16px;
+  font-size: 18px;
   font-family: Arial, Helvetica, sans-serif;
+}
+
+.oc-d-icon {
+  height: 18px;
+  width: 18px;
+  background-size: contain;
+  opacity: 0.65;
+  transition: opacity .25s;
+}
+
+.oc-d-icon:hover {
+  opacity: .4;
 }
 
 .oc-d-close {
@@ -46,7 +58,6 @@
 }
 
 .oc-d-close:hover {
-  cursor: pointer;
   background-color: white;
   color: #5881b3;
 }
@@ -82,7 +93,6 @@
 
 .oc-d-li>i {
   font-size: 16px;
-  cursor: pointer;
   transition: color .25s;
 }
 
@@ -97,10 +107,4 @@
   border-radius: 2px;
   margin-right: 10px;
   max-width: 70%;
-  cursor: pointer;
 }
-
-
-/* .oc-d-li>span:hover {
-  background-color: #323232;
-} */

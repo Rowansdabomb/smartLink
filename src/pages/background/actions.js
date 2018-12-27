@@ -36,45 +36,32 @@ export const setOrigin = (top, left) => ({
 export const toggleFlyout = () => ({
   type: 'TOGGLE-FLYOUT',
 })
-// export const addDragItem = (item) => ({
-//   type: 'ADD-DRAG-ITEM',
-//   item: item
-// })
-// export const removeDragItem = (index) => ({
-//   type: 'REMOVE-DRAG-ITEM',
-//   index: index
-// })
 
-
-// export const openflyout = () => ({
-//   type: 'OPEN-DRAG-ELEMENT',
-// })
-// export const closeflyout = () => ({
-//   type: 'CLOSE-DRAG-ELEMENT',
-// })
-
-// ATTRIBUTE ACTIONS
-export const addAttribute = (attributes) => ({
-  type: 'ADD-ATTRIBUTE',
-  attributes: attributes
+// RANGE-DATA ACTIONS
+export const addRangeData = (rangeData) => ({
+  type: 'ADD-RANGE-DATA',
+  rangeData: rangeData
 })
-export const removeAttribute = (index) => ({
-  type: 'REMOVE-ATTRIBUTE',
+export const removeRangeData = (index) => ({
+  type: 'REMOVE-RANGE-DATA',
   index: index
 })
 export const updateUrl = (url) => ({
   type: 'UPDATE-URL',
   url: url
 })
-export const loadAttributes = (url) => ({
-  type: 'LOAD-ATTRIBUTES',
+export const loadRangeData = (url) => ({
+  type: 'LOAD-RANGE-DATA',
   url: url
 })
-export const setAttributes = (attributes, url) => ({
-  type: 'SET-ATTRIBUTES',
-  attributes: attributes,
+export const setRangeData = (rangeData, url) => ({
+  type: 'SET-RANGE-DATA',
+  rangeData: rangeData,
   url: url
 })
-export const resetAttributes = () => ({
-  type: 'RESET-ATTRIBUTES',
+export const resetRangeData = () => ({
+  type: 'RESET-RANGE-DATA'
+})
+export const reset = () => ({
+  type: 'RESET',
 })

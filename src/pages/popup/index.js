@@ -5,7 +5,7 @@ import {Store} from 'react-chrome-redux'
 import App from './app';
 
 const store = new Store({
-  portName: 'OCTOCOMPARE',
+  portName: 'SMARTLINK',
 })
 
 store.ready().then(() => {
