@@ -5,11 +5,7 @@ import ColorSelect from "./ColorSelect";
 import "./app.css";
 
 import {
-  incrementCurrentSelection,
-  decrementCurrentSelection,
-  // incrementTotalSelection,
-  // setTotalSelection,
-  // setCurrentSelection,
+  toggleFlyout,
 } from "../background/actions";
 
 const colors = {
@@ -22,9 +18,13 @@ const colors = {
 }
 
 class App extends React.Component {
+  clearLocalStorage = () => {
+    chrome.tabs.query({active: true, currentWindow: true}, tabs => {
+      chrome.tabs.sendMessage(tabs[0].id, {type: 'CLEAR-LOCAL-STORAGE'});
+    });
+  }
 
   render() {
-    // console.log(this.props)
     return (
       <div className='container'>
         <h3>This exstension is in Beta</h3>
@@ -34,43 +34,29 @@ class App extends React.Component {
         <div className='row'>
           {Object.keys(colors).map((key, index) => <ColorSelect key={index} color={colors[key]}/> )}
         </div>
-        {/* <div className='row'>
-            <div  id='prev' 
+        <div className='row'>
+            <div id='clear-data' 
                 className='button'
-                onClick={() => this.props.decrement()}>Prev</div>
-            <div id='anchorTracker'>{this.props.current}/{this.props.total}</div>
-            <div id='next' 
+                onClick={() => this.clearLocalStorage()}>Clear Stored Data</div>
+        </div>
+        <div className='row'>
+            <div id='toggle-flyout' 
                 className='button'
-                onClick={() => this.props.increment()}>Next</div>
-
-        </div> */}
-        {/* <div className='row'>
-            <div  id='clear' 
-                className='button'
-                onClick={() => this.props.clear(0)}>Clear</div>
-            <div  id='reset' 
-                className='button'
-                onClick={() => this.props.reset(0)}>Reset</div>
-            <div id='up' 
-                className='button'
-                onClick={() => this.props.incrementTotal()}>+1</div>
-        </div> */}
+                onClick={() => this.props.toggleFlyout()}>
+                  {this.props.flyoutHide ? 'Show Flyout': 'Hide Flyout'}
+            </div>
+        </div>
       </div>
     )
   }
 }
 
 const mapStateToProps = state => ({
-  // current: state.selection.current,
-  // total: state.selection.total,
+  flyoutHide: state.flyout.hide
 });
 
 const mapDispatchToProps = dispatch => ({
-  // increment: () => dispatch(incrementCurrentSelection()),
-  // decrement: () => dispatch(decrementCurrentSelection()),
-  // incrementTotal: () => dispatch(incrementTotalSelection()),
-  // clear: (value) => dispatch(setTotalSelection(value)),
-  // reset: (value) => dispatch(setCurrentSelection(value)),
+  toggleFlyout: () => dispatch(toggleFlyout()),
 });
 
 export default connect(

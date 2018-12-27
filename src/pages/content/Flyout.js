@@ -3,10 +3,11 @@ import {render} from 'react-dom';
 import {Store} from 'react-chrome-redux';
 import {connect} from 'react-redux';
 
-import './drag.css';
+import './flyout.css';
 
 import {
   setOrigin, 
+  toggleFlyout,
   removeAttribute,
 } from "../background/actions";
 
@@ -19,10 +20,10 @@ const store = new Store({
   portName: 'OCTOCOMPARE',
 })
 
-class Drag extends React.Component {
+class Flyout extends React.Component {
   constructor(props) {
     super(props);
-    this.dragElement = React.createRef();
+    this.flyout = React.createRef();
     this.state = {
       pos: {
         x: this.props.origin[1],
@@ -30,25 +31,16 @@ class Drag extends React.Component {
       },
       dragging: false,
       rel: null,
-      open: this.props.attributes.length > 0,
     }
   }
 
   componentDidMount() {
     let url = new URLSearchParams(window.location.search)
-    if(url.has(SL_URL)) {
-      this.setState({
-        open: true
-      })
-    }
+    if(url.has(SL_URL) && this.props.flyoutHide) 
+      this.props.toggleFlyout()
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if ( this.props.attributes.length > prevProps.attributes.length) {
-      this.setState({
-        open: true
-      })
-    }
     if (this.state.dragging && !prevState.dragging) {
       document.addEventListener('mousemove', this.onMouseMove)
       document.addEventListener('mouseup', this.onMouseUp)
@@ -60,7 +52,7 @@ class Drag extends React.Component {
 
   onMouseDown = (e) => {
     if (e.button !== 0) return
-    let pos = this.dragElement.current
+    let pos = this.flyout.current
     this.setState({
       dragging: true,
       rel: {
@@ -90,16 +82,9 @@ class Drag extends React.Component {
     this.props.setOrigin(this.state.pos.y, this.state.pos.x)
   }
 
-  closeDragElement = () => {
-    this.setState({
-      open: false
-    })
-  }
-
   renderItem = (index, selection) => {
     const at = this.props.attributes[index][0]
     const ai = this.props.attributes[index][2]
-    console.log(selection, selection[selection.length - 1])
     return(
       <div key={index} className='oc-d-li'>
         <span onClick={() => {goToLocation(true, at, ai)}}>{selection}{' '}{index}</span>
@@ -110,17 +95,16 @@ class Drag extends React.Component {
   } 
 
   render() {
-    console.log(this.props)
     const originStyle = {top: this.state.pos.y, left: this.state.pos.x}
     return(
       <div id='oc-d-wrapper'>
-        {this.state.open && 
+        {!this.props.flyoutHide && this.props.attributes.length > 0 &&
           <div id='oc-d-container' 
-            ref={this.dragElement}
+            ref={this.flyout}
             style={originStyle}>
             <div id='oc-d-header' onMouseDown={(e) => this.onMouseDown(e)}>
               <div className="oc-d-title">Highlight Selections</div>
-              <i className="oc-d-close fa fa-times" onClick={() => {this.closeDragElement()}}></i>
+              <i className="oc-d-close fa fa-times" onClick={() => {this.props.toggleFlyout()}}></i>
             </div>
             <div className="oc-d-ol">
               {this.props.attributes.map((selection, index) => {
@@ -135,19 +119,18 @@ class Drag extends React.Component {
 }
 
 const mapStateToProps = (state) => ({
-  origin : state.dragElement.origin,
-  attributes: state.attributes.attributes,
-  // isOpen : state.dragElement.isOpen
+  origin : state.flyout.origin,
+  attributes: state.pageData.attributes,
+  flyoutHide : state.flyout.hide
 });
 
 const mapDispatchToProps = dispatch => ({
   setOrigin: (top, left) => dispatch(setOrigin(top, left)),
+  toggleFlyout: () => dispatch(toggleFlyout()),
   removeAttribute: (index) => dispatch(removeAttribute(index))
-  // close: () => dispatch(closeDragElement()),
-  // open: () => dispatch(openDragElement())
 });
 
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(Drag);
+)(Flyout);

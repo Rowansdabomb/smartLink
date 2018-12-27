@@ -7,24 +7,20 @@ import throttle from 'lodash/throttle';
 import { saveState, loadState } from './localstorage';
 const store = createStore(
   reducer,
-  loadState()
+  loadState(),
 );
 
 store.subscribe(throttle(() => {
   saveState({
-    // bookmark: store.getState().bookmark,
-    // settings: store.getState().settings,
-    // animation: store.getState().animation,
-
-    // attributes: store.getState().attributes,
+    pageData: store.getState().pageData,
     colors: store.getState().colors,
-    dragElement: store.getState().dragElement,
+    flyout: store.getState().flyout,
     // selection: store.getState().selection,
   })
 }), 1000);
 
 wrapStore(store, {
   portName: 'OCTOCOMPARE',
-})
+}) 
 
 export default store;

@@ -1,26 +1,34 @@
 export const SL_CLASS = 'surl-highlight'
 export const SL_URL = 'surl-data'
-
-const initData = () => {
-// Called on Page load. 
-// Unpacks attribute data from url. 
-// Updates state attributes
-
-  const queryParams = new URLSearchParams(window.location.search)
-  const data = queryParams.get('SL_URL')
-  
-  if (data === null) return false
-
-  const result = data.split('.').map((element, index) => {
-    if (index > 1) return element.split('_').map((element) => {return Number(element)})
-    else return element.split('_').map((element) => {return element})
-  }); 
-  state.appendAttributes(result)
-  for (let i = 0; i < state.attributes[0].length; i++) {
-    wrapSelection(i)
-    // dragElement.addItem(i)
-  }
+export const colors = {
+  'orange': '#ff670099',
+  'yellow': '#ffd30099',
+  'green': '#43ae3999',
+  'blue': '#aad5ff99',
+  'red': '#c92e2e99',
+  'none': 'transparent'
 }
+
+// const initData = () => {
+// // Called on Page load. 
+// // Unpacks attribute data from url. 
+// // Updates state attributes
+
+//   const queryParams = new URLSearchParams(window.location.search)
+//   const data = queryParams.get(SL_URL)
+  
+//   if (data === null) return false
+
+//   const result = data.split('.').map((element, index) => {
+//     if (index > 1) return element.split('_').map((element) => {return Number(element)})
+//     else return element.split('_').map((element) => {return element})
+//   }); 
+//   // state.appendAttributes(result)
+//   for (let i = 0; i < state.attributes[0].length; i++) {
+//     wrapSelection(i)
+//     // flyout.addItem(i)
+//   }
+// }
 
 var getTextNodesBetween = (rootNode, startNode, endNode) => {
   var pastStartNode = false, reachedEndNode = false, textNodes = [];
@@ -59,7 +67,7 @@ var wrapRange = (range, index) => {
     return null
   }
 
-  // dragElement.addItem(index)
+  // flyout.addItem(index)
   
   return null
 }
@@ -95,7 +103,6 @@ export var wrapSelection = (index, attributes) => {
 // return: true if highlightedSelection is valid
 // console.log(attributes)
   try {
-    console.log('here', attributes)
     var [at, ft, ai, fi, ao, fo, iai, ifi] = attributes;
   } catch (error) {
     console.warn(error)

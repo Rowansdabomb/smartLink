@@ -2,15 +2,20 @@
 const defaultState = {
   origin: [0, 0],
   // items: []
-  // isDragOpen: false
+  hide: true
 }
 
-const dragElement = (state=defaultState, action) => {
+const flyout = (state=defaultState, action) => {
   switch (action.type) {
-    case 'SET-DRAG-ELEMENT-ORIGIN':
+    case 'SET-FLYOUT-ORIGIN':
       return {
         ...state,
         origin: [action.top, action.left]
+      }
+    case 'TOGGLE-FLYOUT':
+      return {
+        ...state,
+        hide: state.hide ? false: true
       }
     // case 'ADD-DRAG-ITEM':
     //   return {
@@ -36,4 +41,4 @@ const dragElement = (state=defaultState, action) => {
   return state
 }
 
-export default dragElement;
+export default flyout;
