@@ -72,10 +72,7 @@ class Highlight extends React.Component {
 
   componentDidUpdate(prevProps, prevState) {
     // Highlight new selections or pre-existing selections
-    console.log("current", this.props.pageData)
-    console.log("prev", prevProps.pageData.rangeData)
     if (this.props.pageData.rangeData.length > prevProps.pageData.rangeData.length) {
-      console.log('wrapSelection')
       const selection = this.props.pageData.rangeData[this.props.pageData.rangeData.length - 1]
       wrapSelection(selection[selection.length - 1], selection)
       this.highlight()
